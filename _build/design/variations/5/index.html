@@ -1,0 +1,1943 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PushPad — The Builders' Almanac, Vol. III</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,600&family=DM+Mono:wght@300;400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Paper-feel dark base */
+    --paper-0:#15100c;        /* deepest void, gutter */
+    --paper-1:#1d1611;        /* page */
+    --paper-2:#251c15;        /* card */
+    --paper-3:#2e231a;        /* edge */
+    --paper-4:#3a2c20;        /* divider/ink-rule */
+
+    /* Inks */
+    --ink-bone:#f1e4cf;       /* primary text — bone white */
+    --ink-cream:#e9d5b5;      /* secondary text */
+    --ink-sepia:#b89472;      /* tertiary / metadata */
+    --ink-mute:#7a5a40;       /* mute */
+
+    /* Letterpress accents — earthy palette */
+    --rust:#c2410c;           /* primary accent */
+    --rust-deep:#9a3209;
+    --ochre:#d4a256;
+    --sienna:#a85b30;
+    --olive:#7a8540;
+    --vermillion:#dd5a35;
+    --plum:#6b3c4a;
+
+    --serif:'Fraunces','EB Garamond',Georgia,serif;
+    --mono:'DM Mono',ui-monospace,Menlo,monospace;
+    --hand:'Caveat',cursive;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+
+  body{
+    font-family:var(--serif);
+    background:var(--paper-1);
+    color:var(--ink-bone);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    font-feature-settings:'ss01','ss02','onum','liga';
+    overflow-x:hidden;
+  }
+
+  /* ===== Paper grain & vignette ===== */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none; z-index:1;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.85  0 0 0 0 0.7  0 0 0 0.32 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.55'/></svg>");
+    mix-blend-mode:overlay;
+    opacity:.35;
+  }
+  body::after{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none; z-index:2;
+    background:
+      radial-gradient(120% 80% at 50% 0%, transparent 50%, rgba(0,0,0,.35) 100%),
+      radial-gradient(60% 50% at 50% 50%, rgba(194,65,12,.04), transparent 60%);
+  }
+
+  /* container — like a folio */
+  .folio{
+    position:relative; z-index:3;
+    max-width:1320px;
+    margin:0 auto;
+    padding:0 56px;
+  }
+
+  /* ===== Masthead ===== */
+  .masthead{
+    padding:28px 0 18px;
+    border-bottom:1px solid var(--paper-4);
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:end;
+    gap:24px;
+    position:relative;
+  }
+  .masthead .left, .masthead .right{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-sepia);
+    display:flex; gap:18px; align-items:center;
+  }
+  .masthead .right{justify-content:flex-end}
+  .vol-stamp{
+    border:1px solid var(--paper-4);
+    padding:4px 10px;
+    border-radius:1px;
+    color:var(--ochre);
+  }
+  .center-mark{
+    text-align:center;
+    line-height:1.1;
+  }
+  .center-mark .wordmark{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:34px;
+    letter-spacing:-.02em;
+    font-style:italic;
+    color:var(--ink-bone);
+  }
+  .center-mark .wordmark span{
+    color:var(--rust);
+    font-style:normal;
+    font-weight:900;
+    letter-spacing:-.04em;
+  }
+  .center-mark .tag{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    color:var(--ink-mute);
+    margin-top:2px;
+  }
+  .nav-links a{
+    color:var(--ink-cream);
+    text-decoration:none;
+    border-bottom:1px dotted var(--paper-4);
+    padding-bottom:2px;
+    transition:color .18s, border-color .18s;
+  }
+  .nav-links a:hover{color:var(--rust); border-color:var(--rust)}
+  .nav-pill{
+    background:var(--rust);
+    color:var(--paper-1);
+    padding:7px 14px;
+    border-radius:1px;
+    font-weight:500;
+    border-bottom:none !important;
+    box-shadow: 1px 1px 0 var(--rust-deep), 0 0 0 1px rgba(0,0,0,.3) inset;
+  }
+  .nav-pill:hover{background:var(--vermillion); color:var(--paper-0) !important}
+
+  /* ===== Issue rule (the double-line under masthead) ===== */
+  .issue-rule{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 0;
+    border-bottom:3px double var(--paper-4);
+    font-family:var(--mono);
+    font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .issue-rule .dot{
+    width:5px; height:5px; background:var(--ochre); border-radius:50%;
+    box-shadow:0 0 0 3px rgba(212,162,86,.18);
+    display:inline-block; margin:0 6px;
+  }
+
+  /* ===== Hero ===== */
+  .hero{
+    position:relative;
+    padding:54px 0 28px;
+    display:grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap:64px;
+  }
+  .hero::before{
+    /* old-paper foxing stain top-left */
+    content:""; position:absolute;
+    width:280px; height:280px; left:-40px; top:30px;
+    background:radial-gradient(circle, rgba(168,91,48,.15), transparent 70%);
+    pointer-events:none;
+  }
+  .hero-eyebrow{
+    font-family:var(--mono);
+    font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--rust);
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:22px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after{
+    content:""; flex:0 0 28px; height:1px; background:var(--paper-4);
+  }
+  .hero-eyebrow::after{flex:1}
+
+  h1.headline{
+    font-family:var(--serif);
+    font-weight:300;
+    font-size:108px;
+    line-height:.92;
+    letter-spacing:-.035em;
+    margin:0;
+    color:var(--ink-bone);
+    font-feature-settings:'ss01','ss02','salt';
+  }
+  h1.headline em{
+    font-style:italic;
+    font-weight:600;
+    color:var(--rust);
+    position:relative;
+    padding:0 4px;
+  }
+  h1.headline em::after{
+    /* hand underline */
+    content:""; position:absolute; left:2px; right:2px; bottom:-6px;
+    height:8px; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 C 40 2, 90 11, 130 5 S 196 9, 198 4' stroke='%23c2410c' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+    background-size:100% 100%; background-repeat:no-repeat;
+    opacity:.7;
+  }
+  h1.headline .amp{
+    font-family:var(--serif);
+    font-style:italic;
+    font-weight:300;
+    color:var(--ochre);
+    font-size:1.05em;
+  }
+
+  .hero-deck{
+    margin-top:28px;
+    font-size:18.5px;
+    line-height:1.55;
+    color:var(--ink-cream);
+    max-width:540px;
+    font-weight:400;
+  }
+  .hero-deck b{
+    font-weight:600;
+    color:var(--ink-bone);
+    background:linear-gradient(transparent 60%, rgba(212,162,86,.18) 60%);
+    padding:0 2px;
+  }
+
+  .hero-cta{
+    margin-top:34px;
+    display:flex;
+    gap:14px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    padding:14px 22px;
+    text-decoration:none;
+    border-radius:1px;
+    display:inline-flex; align-items:center; gap:10px;
+    cursor:pointer;
+    transition:all .18s ease;
+  }
+  .btn-primary{
+    background:var(--rust);
+    color:var(--paper-0);
+    border:1px solid var(--rust);
+    box-shadow: 3px 3px 0 var(--rust-deep), inset 0 0 0 1px rgba(0,0,0,.25);
+    font-weight:600;
+  }
+  .btn-primary:hover{
+    transform:translate(-2px,-2px);
+    box-shadow:5px 5px 0 var(--rust-deep), inset 0 0 0 1px rgba(0,0,0,.25);
+  }
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink-cream);
+    border:1px solid var(--paper-4);
+  }
+  .btn-ghost:hover{border-color:var(--ochre); color:var(--ochre)}
+  .btn-arrow{
+    width:14px; height:8px;
+    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 8'><path d='M0 4 H12 M9 1 L13 4 L9 7' stroke='currentColor' stroke-width='1.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-size:contain; background-repeat:no-repeat;
+  }
+
+  .hero-meta{
+    margin-top:38px;
+    display:flex;
+    gap:36px;
+    border-top:1px solid var(--paper-4);
+    padding-top:22px;
+    align-items:flex-start;
+  }
+  .hero-meta-item .num{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:34px;
+    line-height:1;
+    color:var(--ochre);
+    font-feature-settings:'tnum';
+    letter-spacing:-.02em;
+  }
+  .hero-meta-item .num em{font-style:italic; color:var(--rust); font-weight:600}
+  .hero-meta-item .lbl{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink-mute);
+    margin-top:6px;
+  }
+
+  /* ===== Hero illustration column ===== */
+  .hero-art{
+    position:relative;
+    align-self:start;
+    padding-top:6px;
+  }
+  .plate{
+    position:relative;
+    border:1px solid var(--paper-4);
+    background:
+      linear-gradient(180deg, var(--paper-2), var(--paper-1));
+    padding:22px 22px 18px;
+    box-shadow: -2px 2px 0 var(--paper-3);
+  }
+  .plate-caption{
+    margin-top:14px;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--ink-sepia);
+    display:flex; justify-content:space-between;
+    border-top:1px dotted var(--paper-4);
+    padding-top:10px;
+  }
+  .plate-caption span:last-child{color:var(--rust)}
+  .plate-fig{
+    font-family:var(--serif); font-style:italic;
+    color:var(--ochre); font-size:13px;
+  }
+  /* Marginalia */
+  .marginalia{
+    position:absolute;
+    font-family:var(--hand);
+    font-size:18px;
+    color:var(--ochre);
+    line-height:1.2;
+    transform:rotate(-4deg);
+    pointer-events:none;
+  }
+  .marginalia.m1{ right:-30px; top:-22px; max-width:200px; transform:rotate(6deg); color:var(--rust)}
+  .marginalia.m1::before{
+    /* arrow */
+    content:""; position:absolute; left:-46px; top:36px;
+    width:60px; height:30px;
+    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'><path d='M58 20 C 40 26, 30 14, 14 14 M14 14 L20 8 M14 14 L20 20' stroke='%23c2410c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-size:contain; background-repeat:no-repeat;
+  }
+
+  /* ===== A two-column running text section under hero ===== */
+  .col-rule{
+    margin-top:60px;
+    border-top:3px double var(--paper-4);
+    padding-top:14px;
+    font-family:var(--mono); font-size:10px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink-mute);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+
+  /* ===== LEADERBOARD ===== */
+  .board-section{
+    padding:36px 0 60px;
+    position:relative;
+  }
+  .board-head{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    align-items:end;
+    gap:24px;
+    margin-bottom:20px;
+  }
+  .board-title{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:54px;
+    line-height:1;
+    margin:0;
+    letter-spacing:-.025em;
+    color:var(--ink-bone);
+  }
+  .board-title em{font-style:italic; color:var(--ochre); font-weight:500}
+  .board-sub{
+    font-family:var(--serif);
+    font-style:italic;
+    color:var(--ink-sepia);
+    font-size:15px;
+    margin-top:8px;
+  }
+  .board-tabs{
+    display:flex;
+    gap:0;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-sepia);
+    border:1px solid var(--paper-4);
+    border-radius:1px;
+  }
+  .board-tabs button{
+    background:transparent; border:none; color:inherit;
+    padding:8px 14px; cursor:pointer;
+    border-right:1px solid var(--paper-4);
+    font:inherit;
+    transition: all .15s;
+  }
+  .board-tabs button:last-child{border-right:none}
+  .board-tabs button.active{
+    background:var(--rust); color:var(--paper-0); font-weight:600;
+  }
+  .board-tabs button:hover:not(.active){color:var(--ochre)}
+
+  .board{
+    border-top:2px solid var(--paper-4);
+    border-bottom:2px solid var(--paper-4);
+  }
+  .board-header{
+    display:grid;
+    grid-template-columns: 56px 1.6fr 1fr 130px 130px 80px;
+    gap:18px;
+    padding:10px 16px;
+    font-family:var(--mono);
+    font-size:9.5px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--ink-mute);
+    border-bottom:1px solid var(--paper-4);
+    background:rgba(0,0,0,.12);
+  }
+  .row{
+    display:grid;
+    grid-template-columns: 56px 1.6fr 1fr 130px 130px 80px;
+    gap:18px;
+    padding:18px 16px;
+    align-items:center;
+    border-bottom:1px solid var(--paper-3);
+    transition:background .2s;
+    position:relative;
+  }
+  .row:hover{ background:rgba(212,162,86,.04) }
+  .row:last-child{border-bottom:none}
+  .row.featured{
+    background:linear-gradient(90deg, rgba(194,65,12,.07), transparent 60%);
+  }
+  .row.featured::before{
+    content:"FEATURED"; position:absolute; left:-6px; top:14px;
+    font-family:var(--mono); font-size:8px; letter-spacing:.2em;
+    color:var(--paper-1); background:var(--rust);
+    padding:2px 6px; transform:rotate(-90deg) translateY(-30px); transform-origin:left top;
+  }
+
+  .rank{
+    font-family:var(--serif);
+    font-weight:300;
+    font-size:42px;
+    line-height:1;
+    color:var(--ink-cream);
+    font-feature-settings:'lnum';
+    text-align:left;
+    letter-spacing:-.04em;
+  }
+  .rank.top{
+    color:var(--rust);
+    font-style:italic;
+    font-weight:600;
+  }
+  .rank-arrow{
+    display:block;
+    font-family:var(--mono);
+    font-size:9px; letter-spacing:.1em;
+    margin-top:4px;
+    color:var(--olive);
+  }
+  .rank-arrow.down{color:var(--sienna)}
+  .rank-arrow.flat{color:var(--ink-mute)}
+
+  .proj{
+    display:flex; gap:14px; align-items:center;
+  }
+  .proj-mark{
+    width:44px; height:44px; flex:0 0 44px;
+    border:1px solid var(--paper-4);
+    background:var(--paper-2);
+    border-radius:1px;
+    position:relative;
+    overflow:hidden;
+  }
+  .proj-meta h3{
+    margin:0;
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:20px;
+    line-height:1.1;
+    letter-spacing:-.01em;
+    color:var(--ink-bone);
+  }
+  .proj-meta h3 a{color:inherit; text-decoration:none}
+  .proj-meta .tag{
+    font-family:var(--serif); font-style:italic;
+    color:var(--ink-sepia); font-size:14px;
+    margin-top:2px;
+    line-height:1.4;
+    max-width:340px;
+  }
+  .stack{
+    display:flex; gap:6px; flex-wrap:wrap;
+  }
+  .chip{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border:1px solid var(--paper-4);
+    color:var(--ink-cream);
+    border-radius:1px;
+    background:rgba(0,0,0,.18);
+    box-shadow: inset 0 0 0 1px rgba(241,228,207,.04);
+  }
+  .chip.ochre{ color:var(--ochre); border-color:rgba(212,162,86,.4) }
+  .chip.olive{ color:var(--olive); border-color:rgba(122,133,64,.4) }
+  .chip.plum{ color:#cf99a8; border-color:rgba(107,60,74,.6) }
+  .chip.rust{ color:var(--rust); border-color:rgba(194,65,12,.5)}
+
+  .ver{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--ink-bone);
+    letter-spacing:.02em;
+  }
+  .ver .ago{
+    display:block;
+    font-family:var(--serif); font-style:italic;
+    color:var(--ink-mute); font-size:12px;
+    margin-top:2px;
+    letter-spacing:0;
+  }
+
+  .velocity{
+    display:flex; align-items:center; gap:10px;
+  }
+  .velocity .v-num{
+    font-family:var(--serif);
+    font-size:24px; font-weight:600;
+    color:var(--ochre);
+    line-height:1;
+    font-feature-settings:'tnum';
+  }
+  .velocity .v-num em{font-style:italic; color:var(--rust)}
+  .velocity .spark{
+    width:74px; height:28px;
+  }
+  .velocity .spark path.line{
+    fill:none; stroke:var(--rust); stroke-width:1.5; stroke-linejoin:round;
+  }
+  .velocity .spark path.area{
+    fill:rgba(194,65,12,.18);
+  }
+  .velocity .spark.olive path.line{ stroke:var(--olive) }
+  .velocity .spark.olive path.area{ fill:rgba(122,133,64,.18) }
+  .velocity .spark.ochre path.line{ stroke:var(--ochre) }
+  .velocity .spark.ochre path.area{ fill:rgba(212,162,86,.18) }
+
+  .row .updates{
+    text-align:right;
+    font-family:var(--serif);
+    font-size:13px;
+    color:var(--ink-cream);
+    font-style:italic;
+    line-height:1.3;
+  }
+  .row .updates .qmark{
+    font-family:var(--serif);
+    color:var(--rust);
+    font-size:18px;
+    font-style:normal;
+    line-height:0;
+  }
+
+  .board-foot{
+    padding:14px 16px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--mono); font-size:10px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-mute);
+    background:rgba(0,0,0,.18);
+  }
+  .board-foot a{ color:var(--ochre); text-decoration:none }
+  .board-foot a:hover{ color:var(--rust) }
+
+  /* ===== HOW IT WORKS — 3 plates ===== */
+  .how{
+    padding:90px 0 70px;
+    position:relative;
+  }
+  .how::before{
+    /* foxing top right */
+    content:""; position:absolute; right:-40px; top:50px;
+    width:300px; height:300px;
+    background:radial-gradient(circle, rgba(122,133,64,.1), transparent 70%);
+    pointer-events:none;
+  }
+  .section-eyebrow{
+    font-family:var(--mono);
+    font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--rust);
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:14px;
+  }
+  .section-eyebrow::before{ content:""; flex:0 0 28px; height:1px; background:var(--paper-4)}
+  .section-title{
+    font-family:var(--serif);
+    font-size:64px; font-weight:300;
+    letter-spacing:-.025em;
+    line-height:1;
+    margin:0;
+    color:var(--ink-bone);
+    max-width:780px;
+  }
+  .section-title em{ font-style:italic; color:var(--ochre); font-weight:500}
+  .section-title .amp{ color:var(--rust); font-style:italic; font-weight:600; }
+  .section-deck{
+    margin-top:18px;
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:18px;
+    color:var(--ink-cream);
+    max-width:560px;
+    line-height:1.55;
+  }
+
+  .three-up{
+    margin-top:50px;
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:1px;
+    background:var(--paper-4);
+    border:1px solid var(--paper-4);
+  }
+  .step{
+    background:var(--paper-1);
+    padding:34px 30px 32px;
+    position:relative;
+    min-height:380px;
+  }
+  .step .step-no{
+    font-family:var(--serif);
+    font-style:italic;
+    font-weight:300;
+    font-size:120px;
+    line-height:1;
+    color:var(--paper-3);
+    position:absolute;
+    top:14px; right:22px;
+    user-select:none;
+    z-index:0;
+  }
+  .step h3{
+    position:relative; z-index:1;
+    font-family:var(--serif);
+    font-size:30px;
+    font-weight:600;
+    line-height:1.05;
+    letter-spacing:-.015em;
+    margin:0 0 12px;
+    color:var(--ink-bone);
+    max-width:80%;
+  }
+  .step h3 em{ font-style:italic; color:var(--rust)}
+  .step p{
+    position:relative; z-index:1;
+    font-size:15.5px;
+    color:var(--ink-cream);
+    line-height:1.6;
+    margin:0 0 20px;
+  }
+  .step .step-illus{
+    position:relative; z-index:1;
+    margin-top:auto;
+    padding-top:14px;
+    border-top:1px dotted var(--paper-4);
+  }
+  .step-illus svg{ display:block; width:100%; height:auto }
+  .step-cap{
+    margin-top:8px;
+    font-family:var(--mono); font-size:9.5px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-mute);
+    display:flex; justify-content:space-between;
+  }
+  .step-cap span:last-child{ color:var(--ochre)}
+
+  /* ===== WHO IT'S FOR — three columns of editorial ===== */
+  .who{
+    padding:60px 0 80px;
+    border-top:3px double var(--paper-4);
+  }
+  .who-grid{
+    margin-top:46px;
+    display:grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    gap:0;
+  }
+  .who-col{
+    padding:0 32px;
+    border-right:1px solid var(--paper-4);
+    position:relative;
+  }
+  .who-col:first-child{ padding-left:0 }
+  .who-col:last-child{ padding-right:0; border-right:none }
+  .who-col .who-mark{
+    width:54px; height:54px; margin-bottom:22px;
+  }
+  .who-col h4{
+    font-family:var(--serif);
+    font-size:27px;
+    font-weight:600;
+    margin:0 0 4px;
+    color:var(--ink-bone);
+    letter-spacing:-.01em;
+  }
+  .who-col h4 em{ font-style:italic; color:var(--rust)}
+  .who-col .who-tag{
+    font-family:var(--mono);
+    font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--ochre);
+    margin-bottom:18px;
+  }
+  .who-col p{
+    font-size:15.5px;
+    color:var(--ink-cream);
+    line-height:1.65;
+    margin:0 0 16px;
+  }
+  .who-col p::first-letter{
+    /* drop cap on first paragraph */
+  }
+  .who-col.first p:first-of-type::first-letter{
+    font-family:var(--serif);
+    font-weight:600;
+    font-style:italic;
+    font-size:54px;
+    float:left;
+    line-height:.9;
+    margin:6px 8px 0 -2px;
+    color:var(--rust);
+  }
+  .who-col ul{
+    margin:0; padding:0; list-style:none;
+    border-top:1px dotted var(--paper-4);
+    padding-top:14px;
+  }
+  .who-col ul li{
+    padding:6px 0;
+    font-family:var(--serif);
+    font-size:14.5px;
+    color:var(--ink-cream);
+    display:flex;
+    gap:10px;
+    align-items:baseline;
+    border-bottom:1px dotted var(--paper-4);
+  }
+  .who-col ul li::before{
+    content:"§";
+    color:var(--rust);
+    font-weight:600;
+  }
+
+  /* ===== Velocity explainer (a single bonus block, like a magazine pull) ===== */
+  .pull{
+    margin:0 auto;
+    padding:60px 0;
+    border-top:3px double var(--paper-4);
+    border-bottom:3px double var(--paper-4);
+    display:grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap:64px;
+    align-items:center;
+  }
+  .pull-quote{
+    font-family:var(--serif);
+    font-style:italic;
+    font-weight:300;
+    font-size:42px;
+    line-height:1.12;
+    letter-spacing:-.01em;
+    color:var(--ink-bone);
+    position:relative;
+  }
+  .pull-quote::before{
+    content:"\201C";
+    position:absolute;
+    left:-44px; top:-30px;
+    font-size:140px;
+    color:var(--rust);
+    line-height:1;
+    font-weight:600;
+    font-style:italic;
+  }
+  .pull-quote em{font-style:italic; color:var(--rust)}
+  .pull-attr{
+    margin-top:22px;
+    font-family:var(--mono); font-size:11px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink-sepia);
+  }
+  .pull-attr b{ color:var(--ochre); font-weight:500 }
+
+  .formula{
+    background:var(--paper-2);
+    border:1px solid var(--paper-4);
+    padding:30px 32px;
+    box-shadow: -3px 3px 0 var(--paper-3);
+  }
+  .formula-cap{
+    font-family:var(--mono); font-size:10px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink-mute);
+    margin-bottom:14px;
+  }
+  .formula-eq{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:24px;
+    line-height:1.4;
+    color:var(--ink-cream);
+  }
+  .formula-eq .v{color:var(--rust); font-weight:600; font-style:normal; font-family:var(--mono); font-size:.8em; padding:2px 6px; border:1px solid var(--rust); border-radius:1px; margin-right:6px}
+  .formula-eq .var{color:var(--ochre); font-weight:600}
+  .formula-eq .op{color:var(--ink-mute); font-style:normal; padding:0 8px}
+  .formula-legend{
+    margin-top:22px;
+    border-top:1px dotted var(--paper-4);
+    padding-top:14px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:8px 22px;
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--ink-sepia);
+    letter-spacing:.04em;
+  }
+  .formula-legend b{ color:var(--ochre); font-weight:500 }
+
+  /* ===== FINAL CTA ===== */
+  .final{
+    padding:90px 0 80px;
+    text-align:center;
+    position:relative;
+  }
+  .final::before{
+    content:""; position:absolute; inset:-1px 20% auto 20%; height:1px;
+    background:linear-gradient(90deg, transparent, var(--rust), transparent);
+  }
+  .final-mark{
+    width:88px; height:88px;
+    margin:0 auto 22px;
+  }
+  .final h2{
+    font-family:var(--serif);
+    font-weight:300;
+    font-size:88px;
+    line-height:.95;
+    letter-spacing:-.03em;
+    margin:0;
+    color:var(--ink-bone);
+  }
+  .final h2 em{font-style:italic; color:var(--rust); font-weight:600}
+  .final h2 .amp{color:var(--ochre); font-style:italic; font-weight:300}
+  .final p{
+    font-family:var(--serif); font-style:italic;
+    font-size:19px;
+    color:var(--ink-cream);
+    margin:18px auto 32px;
+    max-width:560px;
+    line-height:1.5;
+  }
+  .final-cta{
+    display:flex; justify-content:center; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .ticker{
+    margin-top:38px;
+    font-family:var(--mono); font-size:10px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink-mute);
+    display:flex; justify-content:center; gap:28px; flex-wrap:wrap;
+  }
+  .ticker b{ color:var(--ochre); font-weight:500 }
+
+  /* ===== Colophon (footer) ===== */
+  .colophon{
+    border-top:1px solid var(--paper-4);
+    padding:40px 0 50px;
+    margin-top:0;
+    display:grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap:36px;
+    font-size:14px;
+    color:var(--ink-sepia);
+  }
+  .colophon h5{
+    font-family:var(--mono); font-size:10px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink-mute);
+    margin:0 0 14px;
+  }
+  .colophon p{
+    font-family:var(--serif); font-style:italic;
+    color:var(--ink-cream);
+    line-height:1.5;
+    margin:0 0 12px;
+    font-size:14.5px;
+  }
+  .colophon ul{ margin:0; padding:0; list-style:none}
+  .colophon li{ padding:5px 0 }
+  .colophon a{
+    color:var(--ink-cream);
+    text-decoration:none;
+    border-bottom:1px dotted var(--paper-4);
+  }
+  .colophon a:hover{ color:var(--rust); border-color:var(--rust) }
+
+  .colophon-rule{
+    margin-top:30px; padding:18px 0 26px;
+    border-top:1px solid var(--paper-4);
+    display:flex; justify-content:space-between; flex-wrap:wrap;
+    gap:18px;
+    font-family:var(--mono); font-size:10px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink-mute);
+  }
+  .colophon-rule .stamp{
+    color:var(--rust);
+    border:1px solid var(--rust);
+    padding:3px 8px;
+    border-radius:1px;
+  }
+
+  /* small responsive guard */
+  @media (max-width:1100px){
+    .folio{padding:0 28px}
+    h1.headline{font-size:74px}
+    .hero{grid-template-columns:1fr; gap:40px}
+    .three-up{grid-template-columns:1fr}
+    .who-grid{grid-template-columns:1fr}
+    .who-col{border-right:none; border-bottom:1px solid var(--paper-4); padding:24px 0}
+    .pull{grid-template-columns:1fr}
+    .row, .board-header{grid-template-columns:42px 1.4fr 1fr 110px}
+    .row .ver, .row .updates, .board-header .h-ver, .board-header .h-up{display:none}
+  }
+
+  /* fade-in stagger */
+  @keyframes rise {
+    from { opacity:0; transform: translateY(14px) }
+    to { opacity:1; transform: translateY(0) }
+  }
+  .rise{ animation:rise .8s cubic-bezier(.2,.7,.2,1) both }
+  .rise.d1{ animation-delay:.05s }
+  .rise.d2{ animation-delay:.15s }
+  .rise.d3{ animation-delay:.25s }
+  .rise.d4{ animation-delay:.4s }
+
+  @keyframes pulseDot{
+    0%,100%{ box-shadow:0 0 0 0 rgba(212,162,86,.35) }
+    50%{ box-shadow:0 0 0 6px rgba(212,162,86,0) }
+  }
+  .live-dot{
+    width:7px; height:7px; background:var(--rust); border-radius:50%;
+    box-shadow:0 0 0 0 rgba(194,65,12,.4);
+    animation:pulseDot 1.8s ease-out infinite;
+    display:inline-block;
+  }
+</style>
+</head>
+<body>
+<div class="folio">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <div class="left">
+      <span class="vol-stamp">VOL. III · No. 18</span>
+      <span>Wed, May 8, 2026</span>
+    </div>
+    <div class="center-mark">
+      <div class="wordmark">Push<span>Pad</span></div>
+      <div class="tag">The Builders' Almanac · Est. 2026</div>
+    </div>
+    <div class="right nav-links">
+      <a href="#board">The Board</a>
+      <a href="#how">How It Works</a>
+      <a href="#who">Who It's For</a>
+      <a href="#claim" class="nav-pill">Claim a Project</a>
+    </div>
+  </header>
+
+  <div class="issue-rule">
+    <span><span class="live-dot"></span> &nbsp; Live · 2,418 projects · 14,902 releases this month</span>
+    <span>Velocity Window: <b style="color:var(--ochre)">7 days</b></span>
+    <span>Crawl interval: 4 min</span>
+    <span>Featured boost: <b style="color:var(--ochre)">×1.3</b></span>
+    <span>Press run: ∞</span>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow rise d1">Issue 18 · Cover Story</div>
+
+      <h1 class="headline rise d2">
+        What's <em>shipping</em> <br>
+        this week, <span class="amp">&amp;</span><br>
+        who's <em>cooking</em>.
+      </h1>
+
+      <p class="hero-deck rise d3">
+        PushPad is a <b>public, build-in-public leaderboard</b> for indie SaaS.
+        Drop your repo URL — we crawl your GitHub releases, scrape your OG image,
+        and rank you on a velocity score that <em>resets every Sunday at midnight UTC</em>.
+        No vanity stars. Just what you actually shipped.
+      </p>
+
+      <div class="hero-cta rise d3">
+        <a class="btn btn-primary" href="#claim">Claim Your Project <span class="btn-arrow"></span></a>
+        <a class="btn btn-ghost" href="#board">Browse the Board</a>
+      </div>
+
+      <div class="hero-meta rise d4">
+        <div class="hero-meta-item">
+          <div class="num">2,418</div>
+          <div class="lbl">Projects on the Board</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="num"><em>847</em></div>
+          <div class="lbl">Releases This Week</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="num">v0.4.2</div>
+          <div class="lbl">Median Pre-1.0</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="num">11s</div>
+          <div class="lbl">Median Crawl Time</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO ILLUSTRATION : a hand-drawn editorial leaderboard plate -->
+    <div class="hero-art rise d4">
+      <div class="plate">
+        <svg viewBox="0 0 360 380" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- paper texture lines (faint) -->
+          <defs>
+            <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#3a2c20" stroke-width="1"/>
+            </pattern>
+            <pattern id="dotgrid" patternUnits="userSpaceOnUse" width="14" height="14">
+              <circle cx="2" cy="2" r="0.6" fill="#3a2c20"/>
+            </pattern>
+          </defs>
+
+          <!-- dotted background grid -->
+          <rect x="0" y="0" width="360" height="380" fill="url(#dotgrid)" opacity=".55"/>
+
+          <!-- decorative typographic frame -->
+          <rect x="12" y="12" width="336" height="356" fill="none" stroke="#3a2c20" stroke-width="1"/>
+          <rect x="18" y="18" width="324" height="344" fill="none" stroke="#3a2c20" stroke-width="1" stroke-dasharray="2 4"/>
+
+          <!-- title within plate -->
+          <text x="32" y="48" font-family="Fraunces, serif" font-style="italic" font-size="14" fill="#b89472">Plate I.</text>
+          <text x="32" y="66" font-family="Fraunces, serif" font-size="22" font-weight="600" fill="#f1e4cf">The Velocity Press</text>
+          <line x1="32" y1="78" x2="200" y2="78" stroke="#3a2c20"/>
+
+          <!-- Editorial illustration: a vintage printing press / lever scale of velocity -->
+          <!-- Pedestal -->
+          <rect x="60" y="320" width="240" height="20" fill="#251c15" stroke="#3a2c20"/>
+          <rect x="64" y="324" width="232" height="2" fill="#3a2c20"/>
+          <rect x="80" y="300" width="200" height="20" fill="#1d1611" stroke="#3a2c20"/>
+
+          <!-- column / pedestal post -->
+          <rect x="170" y="170" width="20" height="130" fill="#251c15" stroke="#3a2c20"/>
+          <rect x="160" y="170" width="40" height="6" fill="#3a2c20"/>
+          <rect x="160" y="294" width="40" height="6" fill="#3a2c20"/>
+
+          <!-- The lever / beam -->
+          <line x1="60" y1="170" x2="300" y2="170" stroke="#c2410c" stroke-width="3" stroke-linecap="round"/>
+          <!-- lever endcaps -->
+          <circle cx="60" cy="170" r="5" fill="#c2410c"/>
+          <circle cx="300" cy="170" r="5" fill="#c2410c"/>
+          <!-- pivot -->
+          <circle cx="180" cy="170" r="7" fill="#d4a256" stroke="#1d1611" stroke-width="2"/>
+
+          <!-- left pan: GitHub releases stack of papers -->
+          <line x1="60" y1="170" x2="60" y2="225" stroke="#3a2c20" stroke-width="1"/>
+          <g>
+            <!-- stacked release papers -->
+            <rect x="30" y="220" width="60" height="46" fill="#251c15" stroke="#3a2c20" transform="rotate(-2 60 240)"/>
+            <rect x="32" y="218" width="60" height="46" fill="#2e231a" stroke="#3a2c20" transform="rotate(2 60 240)"/>
+            <rect x="30" y="216" width="60" height="46" fill="#1d1611" stroke="#b89472"/>
+            <text x="36" y="232" font-family="DM Mono,monospace" font-size="8" fill="#b89472">v0.4.2</text>
+            <line x1="36" y1="238" x2="80" y2="238" stroke="#3a2c20"/>
+            <line x1="36" y1="244" x2="74" y2="244" stroke="#3a2c20"/>
+            <line x1="36" y1="250" x2="78" y2="250" stroke="#3a2c20"/>
+            <line x1="36" y1="256" x2="64" y2="256" stroke="#3a2c20"/>
+          </g>
+
+          <!-- right pan: a bar chart / ascending newspaper columns -->
+          <line x1="300" y1="170" x2="300" y2="218" stroke="#3a2c20" stroke-width="1"/>
+          <g>
+            <rect x="270" y="248" width="10" height="20" fill="#a85b30"/>
+            <rect x="284" y="236" width="10" height="32" fill="#c2410c"/>
+            <rect x="298" y="224" width="10" height="44" fill="#dd5a35"/>
+            <rect x="312" y="216" width="10" height="52" fill="#d4a256"/>
+            <line x1="266" y1="270" x2="328" y2="270" stroke="#b89472" stroke-width="1"/>
+            <text x="266" y="284" font-family="DM Mono,monospace" font-size="8" fill="#b89472">VELOCITY</text>
+          </g>
+
+          <!-- top decoration: ornamental stars -->
+          <g fill="#d4a256">
+            <path d="M180 100 l3 9 9 0 -7 5 3 9 -8 -5 -8 5 3 -9 -7 -5 9 0 z"/>
+          </g>
+          <text x="180" y="138" text-anchor="middle" font-family="Fraunces,serif" font-size="13" font-style="italic" fill="#e9d5b5">— from input to ranking —</text>
+
+          <!-- decorative brackets -->
+          <path d="M28 90 L20 90 L20 130" fill="none" stroke="#3a2c20"/>
+          <path d="M332 90 L340 90 L340 130" fill="none" stroke="#3a2c20"/>
+
+          <!-- corner ornaments -->
+          <g fill="#c2410c" opacity=".75">
+            <circle cx="22" cy="22" r="2.5"/>
+            <circle cx="338" cy="22" r="2.5"/>
+            <circle cx="22" cy="358" r="2.5"/>
+            <circle cx="338" cy="358" r="2.5"/>
+          </g>
+        </svg>
+        <div class="plate-caption">
+          <span class="plate-fig">fig. 1.1</span>
+          <span>How a release becomes a rank</span>
+          <span>↗ printed in rust</span>
+        </div>
+      </div>
+
+      <div class="marginalia m1">
+        the leaderboard updates every 4&nbsp;min
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ Section rule between hero and board ============ -->
+  <div class="col-rule" id="board">
+    <span>Section II — The Velocity Board</span>
+    <span>This week's standings · Updated 22s ago</span>
+  </div>
+
+  <!-- ============ LEADERBOARD ============ -->
+  <section class="board-section">
+
+    <div class="board-head">
+      <div>
+        <h2 class="board-title">This week's <em>movers</em>.</h2>
+        <div class="board-sub">Top SaaS by 7-day velocity. Ties broken by release frequency, then by alphabet.</div>
+      </div>
+      <div class="board-tabs">
+        <button class="active">This Week</button>
+        <button>This Month</button>
+        <button>All-Time</button>
+        <button>New &amp; Climbing</button>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="board-header">
+        <div>Rank</div>
+        <div>Project</div>
+        <div>Stack</div>
+        <div class="h-ver">Latest Release</div>
+        <div>Velocity (7d)</div>
+        <div class="h-up">Update</div>
+      </div>
+
+      <!-- ROW 1 — featured -->
+      <div class="row featured">
+        <div>
+          <div class="rank top">01</div>
+          <div class="rank-arrow">▲ +4</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- hand SVG mark: linkfolio — a chain of two links -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <g transform="translate(8 11) rotate(-15 14 11)" stroke="#c2410c" stroke-width="2.4" fill="none" stroke-linecap="round">
+                <rect x="0" y="0" width="14" height="22" rx="7"/>
+              </g>
+              <g transform="translate(22 14) rotate(15 14 11)" stroke="#d4a256" stroke-width="2.4" fill="none" stroke-linecap="round">
+                <rect x="0" y="0" width="14" height="22" rx="7"/>
+              </g>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Linkfolio</a></h3>
+            <div class="tag">A bio-link page that auto-updates from your GitHub, Substack, &amp; Bluesky.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip ochre">Next.js</span>
+          <span class="chip">Bun</span>
+          <span class="chip rust">Stripe</span>
+        </div>
+        <div class="ver">v1.10.0<span class="ago">2 hours ago</span></div>
+        <div class="velocity">
+          <div class="v-num"><em>94</em></div>
+          <svg class="spark" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 24 L10 22 L20 18 L30 14 L40 16 L50 10 L60 8 L74 4 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 24 L10 22 L20 18 L30 14 L40 16 L50 10 L60 8 L74 4"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>finally killed the OG fallback bug</div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="row">
+        <div>
+          <div class="rank top">02</div>
+          <div class="rank-arrow">▲ +1</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- tabula : table -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <rect x="8" y="12" width="28" height="20" fill="none" stroke="#d4a256" stroke-width="2"/>
+              <line x1="8" y1="20" x2="36" y2="20" stroke="#d4a256" stroke-width="2"/>
+              <line x1="22" y1="20" x2="22" y2="32" stroke="#d4a256" stroke-width="2"/>
+              <circle cx="14" cy="26" r="1.6" fill="#c2410c"/>
+              <circle cx="30" cy="26" r="1.6" fill="#c2410c"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Tabula</a></h3>
+            <div class="tag">Spreadsheets that actually understand SQL — paste a CSV, query in your head.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip ochre">SvelteKit</span>
+          <span class="chip">DuckDB</span>
+          <span class="chip plum">Cloudflare</span>
+        </div>
+        <div class="ver">v0.7.1<span class="ago">9 hours ago</span></div>
+        <div class="velocity">
+          <div class="v-num">88</div>
+          <svg class="spark ochre" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 18 L10 22 L20 14 L30 16 L40 10 L50 8 L60 12 L74 6 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 18 L10 22 L20 14 L30 16 L40 10 L50 8 L60 12 L74 6"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>shipped a Postgres adapter, finally</div>
+      </div>
+
+      <!-- ROW 3 -->
+      <div class="row">
+        <div>
+          <div class="rank top">03</div>
+          <div class="rank-arrow down">▼ -1</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- crontab.dev : clock-ish -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <circle cx="22" cy="22" r="11" fill="none" stroke="#7a8540" stroke-width="2"/>
+              <line x1="22" y1="22" x2="22" y2="14" stroke="#c2410c" stroke-width="2" stroke-linecap="round"/>
+              <line x1="22" y1="22" x2="29" y2="22" stroke="#c2410c" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="22" cy="22" r="1.4" fill="#d4a256"/>
+              <text x="22" y="11" text-anchor="middle" font-family="DM Mono" font-size="6" fill="#b89472">12</text>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Crontab.dev</a></h3>
+            <div class="tag">A visual cron editor with timezone-safe previews and drift alerts.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip olive">Go</span>
+          <span class="chip">Postgres</span>
+          <span class="chip ochre">Fly.io</span>
+        </div>
+        <div class="ver">v0.4.2<span class="ago">yesterday</span></div>
+        <div class="velocity">
+          <div class="v-num">81</div>
+          <svg class="spark olive" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 6 L10 10 L20 8 L30 14 L40 12 L50 18 L60 16 L74 22 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 6 L10 10 L20 8 L30 14 L40 12 L50 18 L60 16 L74 22"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>migrated to RFC 5545 (rrule)</div>
+      </div>
+
+      <!-- ROW 4 -->
+      <div class="row">
+        <div>
+          <div class="rank">04</div>
+          <div class="rank-arrow">▲ +2</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- mailcrate : envelope -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <rect x="9" y="14" width="26" height="17" fill="none" stroke="#a85b30" stroke-width="2"/>
+              <path d="M9 14 L22 24 L35 14" fill="none" stroke="#a85b30" stroke-width="2"/>
+              <circle cx="33" cy="13" r="3" fill="#c2410c"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Mailcrate</a></h3>
+            <div class="tag">Transactional email built for solo devs — one API, no SPF rabbit-holes.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip">Rust</span>
+          <span class="chip plum">Postmark</span>
+          <span class="chip">Cloudflare</span>
+        </div>
+        <div class="ver">v0.12.4<span class="ago">2 days ago</span></div>
+        <div class="velocity">
+          <div class="v-num">76</div>
+          <svg class="spark" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 22 L10 16 L20 18 L30 12 L40 14 L50 10 L60 12 L74 8 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 22 L10 16 L20 18 L30 12 L40 14 L50 10 L60 12 L74 8"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>EU region went live this morning</div>
+      </div>
+
+      <!-- ROW 5 -->
+      <div class="row">
+        <div>
+          <div class="rank">05</div>
+          <div class="rank-arrow flat">— 0</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- Nibble : pacman/ghost -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <path d="M22 22 L34 14 A14 14 0 1 0 34 30 Z" fill="#d4a256"/>
+              <circle cx="26" cy="17" r="1.6" fill="#1d1611"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Nibble</a></h3>
+            <div class="tag">Tiny SQLite-as-a-service for hobby projects. Free up to 5 dbs.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip">Bun</span>
+          <span class="chip">SQLite</span>
+          <span class="chip ochre">Hetzner</span>
+        </div>
+        <div class="ver">v0.9.0<span class="ago">3 days ago</span></div>
+        <div class="velocity">
+          <div class="v-num">71</div>
+          <svg class="spark ochre" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 14 L10 14 L20 16 L30 10 L40 14 L50 12 L60 14 L74 10 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 14 L10 14 L20 16 L30 10 L40 14 L50 12 L60 14 L74 10"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>litestream replication is in</div>
+      </div>
+
+      <!-- ROW 6 -->
+      <div class="row">
+        <div>
+          <div class="rank">06</div>
+          <div class="rank-arrow">▲ +5</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- shipnotes -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <rect x="11" y="9" width="22" height="26" fill="none" stroke="#c2410c" stroke-width="2"/>
+              <line x1="14" y1="16" x2="30" y2="16" stroke="#b89472" stroke-width="1.4"/>
+              <line x1="14" y1="22" x2="30" y2="22" stroke="#b89472" stroke-width="1.4"/>
+              <line x1="14" y1="28" x2="24" y2="28" stroke="#b89472" stroke-width="1.4"/>
+              <circle cx="32" cy="9" r="3" fill="#d4a256"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Shipnotes</a></h3>
+            <div class="tag">Auto-generated changelogs from your commit messages. AI-assisted (lightly).</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip ochre">Next.js</span>
+          <span class="chip">Postgres</span>
+          <span class="chip rust">OpenAI</span>
+        </div>
+        <div class="ver">v1.4.0<span class="ago">3 days ago</span></div>
+        <div class="velocity">
+          <div class="v-num">68</div>
+          <svg class="spark" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 26 L10 24 L20 20 L30 22 L40 14 L50 16 L60 10 L74 12 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 26 L10 24 L20 20 L30 22 L40 14 L50 16 L60 10 L74 12"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>now scoping by monorepo path</div>
+      </div>
+
+      <!-- ROW 7 -->
+      <div class="row">
+        <div>
+          <div class="rank">07</div>
+          <div class="rank-arrow">▲ +2</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- Ferrule -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <path d="M22 8 L22 36" stroke="#a85b30" stroke-width="2.4" stroke-linecap="round"/>
+              <path d="M14 14 L30 14" stroke="#d4a256" stroke-width="2.4" stroke-linecap="round"/>
+              <path d="M16 22 L28 22" stroke="#d4a256" stroke-width="2"/>
+              <path d="M18 30 L26 30" stroke="#d4a256" stroke-width="1.6"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Ferrule</a></h3>
+            <div class="tag">A Rust crate registry for private orgs. Self-host or managed.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip">Rust</span>
+          <span class="chip">S3</span>
+          <span class="chip">Postgres</span>
+        </div>
+        <div class="ver">v0.3.7<span class="ago">4 days ago</span></div>
+        <div class="velocity">
+          <div class="v-num">64</div>
+          <svg class="spark olive" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 24 L10 26 L20 22 L30 18 L40 22 L50 16 L60 14 L74 16 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 24 L10 26 L20 22 L30 18 L40 22 L50 16 L60 14 L74 16"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>SSO with WorkOS shipped</div>
+      </div>
+
+      <!-- ROW 8 -->
+      <div class="row">
+        <div>
+          <div class="rank">08</div>
+          <div class="rank-arrow down">▼ -3</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- Smolform -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <rect x="11" y="12" width="22" height="6" fill="none" stroke="#dd5a35" stroke-width="2"/>
+              <rect x="11" y="22" width="22" height="6" fill="none" stroke="#dd5a35" stroke-width="2"/>
+              <rect x="11" y="32" width="10" height="3" fill="#c2410c"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Smolform</a></h3>
+            <div class="tag">Lightweight forms with email + Slack notifs. No bloat, no analytics tax.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip ochre">SvelteKit</span>
+          <span class="chip plum">Cloudflare</span>
+          <span class="chip">Resend</span>
+        </div>
+        <div class="ver">v2.0.1<span class="ago">5 days ago</span></div>
+        <div class="velocity">
+          <div class="v-num">59</div>
+          <svg class="spark ochre" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 8 L10 10 L20 14 L30 12 L40 18 L50 16 L60 22 L74 20 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 8 L10 10 L20 14 L30 12 L40 18 L50 16 L60 22 L74 20"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>v2 out — now with file uploads</div>
+      </div>
+
+      <!-- ROW 9 -->
+      <div class="row">
+        <div>
+          <div class="rank">09</div>
+          <div class="rank-arrow">▲ +6</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- queueless -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <circle cx="14" cy="22" r="3.5" fill="#d4a256"/>
+              <circle cx="22" cy="22" r="3.5" fill="#c2410c"/>
+              <circle cx="30" cy="22" r="3.5" fill="#a85b30"/>
+              <line x1="14" y1="32" x2="30" y2="32" stroke="#3a2c20" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Queueless</a></h3>
+            <div class="tag">Background jobs over Postgres. Skip Redis when you don't need it.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip">Postgres</span>
+          <span class="chip ochre">Node</span>
+          <span class="chip">Bun</span>
+        </div>
+        <div class="ver">v0.6.3<span class="ago">5 days ago</span></div>
+        <div class="velocity">
+          <div class="v-num">54</div>
+          <svg class="spark" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 24 L10 22 L20 16 L30 18 L40 12 L50 14 L60 8 L74 10 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 24 L10 22 L20 16 L30 18 L40 12 L50 14 L60 8 L74 10"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>now leases jobs across regions</div>
+      </div>
+
+      <!-- ROW 10 -->
+      <div class="row">
+        <div>
+          <div class="rank">10</div>
+          <div class="rank-arrow flat">— 0</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- soundbite -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <line x1="11" y1="22" x2="11" y2="22" stroke="#c2410c" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="15" y1="18" x2="15" y2="26" stroke="#c2410c" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="19" y1="14" x2="19" y2="30" stroke="#dd5a35" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="23" y1="10" x2="23" y2="34" stroke="#dd5a35" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="27" y1="14" x2="27" y2="30" stroke="#d4a256" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="31" y1="18" x2="31" y2="26" stroke="#d4a256" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="35" y1="22" x2="35" y2="22" stroke="#d4a256" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Soundbite.fm</a></h3>
+            <div class="tag">A podcast-clip generator with auto-captions and waveform thumbnails.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip ochre">Next.js</span>
+          <span class="chip rust">FFmpeg</span>
+          <span class="chip">R2</span>
+        </div>
+        <div class="ver">v1.2.0<span class="ago">a week ago</span></div>
+        <div class="velocity">
+          <div class="v-num">51</div>
+          <svg class="spark ochre" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 18 L10 16 L20 18 L30 14 L40 16 L50 14 L60 16 L74 14 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 18 L10 16 L20 18 L30 14 L40 16 L50 14 L60 16 L74 14"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>spotify oembed now works</div>
+      </div>
+
+      <!-- ROW 11 -->
+      <div class="row">
+        <div>
+          <div class="rank">11</div>
+          <div class="rank-arrow">▲ +1</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- pingboard -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <rect x="9" y="11" width="26" height="22" fill="none" stroke="#7a8540" stroke-width="2"/>
+              <circle cx="14" cy="17" r="1.6" fill="#7a8540"/>
+              <line x1="18" y1="17" x2="30" y2="17" stroke="#7a8540" stroke-width="1.6"/>
+              <circle cx="14" cy="22" r="1.6" fill="#c2410c"/>
+              <line x1="18" y1="22" x2="26" y2="22" stroke="#c2410c" stroke-width="1.6"/>
+              <circle cx="14" cy="27" r="1.6" fill="#d4a256"/>
+              <line x1="18" y1="27" x2="28" y2="27" stroke="#d4a256" stroke-width="1.6"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Pingboard</a></h3>
+            <div class="tag">Public uptime pages with SSL-cert + DNS-drift alerting baked in.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip olive">Go</span>
+          <span class="chip">Postgres</span>
+        </div>
+        <div class="ver">v0.8.5<span class="ago">a week ago</span></div>
+        <div class="velocity">
+          <div class="v-num">47</div>
+          <svg class="spark olive" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 22 L10 18 L20 20 L30 16 L40 18 L50 14 L60 16 L74 14 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 22 L10 18 L20 20 L30 16 L40 18 L50 14 L60 16 L74 14"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>pre-expiry warning at 21d default</div>
+      </div>
+
+      <!-- ROW 12 -->
+      <div class="row">
+        <div>
+          <div class="rank">12</div>
+          <div class="rank-arrow down">▼ -2</div>
+        </div>
+        <div class="proj">
+          <div class="proj-mark">
+            <!-- canvasly -->
+            <svg viewBox="0 0 44 44" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" fill="#1d1611"/>
+              <rect x="11" y="11" width="22" height="22" fill="none" stroke="#a85b30" stroke-width="2"/>
+              <circle cx="17" cy="17" r="2" fill="#d4a256"/>
+              <path d="M11 33 L20 22 L26 28 L33 19" stroke="#c2410c" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+          <div class="proj-meta">
+            <h3><a href="#">Canvasly</a></h3>
+            <div class="tag">An OG image generator that doesn't blow your bundle. CDN-cached.</div>
+          </div>
+        </div>
+        <div class="stack">
+          <span class="chip">Bun</span>
+          <span class="chip plum">Cloudflare</span>
+        </div>
+        <div class="ver">v0.5.0<span class="ago">a week ago</span></div>
+        <div class="velocity">
+          <div class="v-num">42</div>
+          <svg class="spark" viewBox="0 0 74 28" preserveAspectRatio="none">
+            <path class="area" d="M0 12 L10 14 L20 16 L30 14 L40 18 L50 18 L60 22 L74 20 L74 28 L0 28 Z"/>
+            <path class="line" d="M0 12 L10 14 L20 16 L30 14 L40 18 L50 18 L60 22 L74 20"/>
+          </svg>
+        </div>
+        <div class="updates"><span class="qmark">"</span>fixed font fallback on emoji-heavy titles</div>
+      </div>
+    </div>
+
+    <div class="board-foot">
+      <span>Showing 1–12 of 2,418 · Page 1</span>
+      <span><a href="#">View full board →</a></span>
+    </div>
+  </section>
+
+  <!-- ============ The Pull (velocity formula) ============ -->
+  <section class="pull">
+    <div class="pull-quote">
+      Star counts are <em>vanity</em>. Velocity is what you actually <em>shipped</em> this week.
+      <div class="pull-attr">— PushPad's editorial position, since the very first issue. <b>Velocity Window: 7d, decaying linearly.</b></div>
+    </div>
+    <div class="formula">
+      <div class="formula-cap">Plate II — The Velocity Score</div>
+      <div class="formula-eq">
+        <span class="v">V</span>=
+        <span class="op">Σ</span>
+        <span class="var">w(t)</span>
+        <span class="op">·</span>
+        <span class="var">r<sub>type</sub></span>
+        <span class="op">+</span>
+        <span class="var">f<sub>boost</sub></span>
+      </div>
+      <div class="formula-legend">
+        <div><b>w(t)</b> — time-decay over 7d</div>
+        <div><b>r</b> — minor / patch / major</div>
+        <div><b>f</b> — admin-tunable feature boost</div>
+        <div>and a tiny <b>tie-break ε</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="how" id="how">
+    <div class="section-eyebrow">Section III · Process</div>
+    <h2 class="section-title">From <em>commit</em> to <em>cover story</em>, <span class="amp">in</span> three steps.</h2>
+    <p class="section-deck">Drop a repo URL once. PushPad takes care of the rest — crawling, scoring, ranking, and gently nagging you to write the weekly update.</p>
+
+    <div class="three-up">
+
+      <!-- STEP 1 -->
+      <div class="step">
+        <div class="step-no">i.</div>
+        <h3>Claim your <em>project</em>.</h3>
+        <p>Paste a GitHub URL. We pull the README, OG image, latest release tag, and your stack from the manifest. You confirm the title, the one-line tagline, and the hero color. About a minute, total.</p>
+        <div class="step-illus">
+          <svg viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- a hand-drawn URL ribbon entering a box -->
+            <rect x="6" y="40" width="200" height="40" fill="none" stroke="#3a2c20"/>
+            <text x="14" y="65" font-family="DM Mono" font-size="12" fill="#e9d5b5">github.com/you/linkfolio</text>
+            <!-- dotted arrow into a stamped envelope -->
+            <path d="M210 60 C 230 60, 240 60, 256 60" stroke="#c2410c" stroke-width="1.6" stroke-dasharray="3 3" fill="none"/>
+            <path d="M250 56 L260 60 L250 64" stroke="#c2410c" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <rect x="262" y="42" width="50" height="36" fill="#251c15" stroke="#3a2c20"/>
+            <path d="M262 42 L287 60 L312 42" fill="none" stroke="#3a2c20"/>
+            <!-- stamp -->
+            <rect x="270" y="48" width="22" height="14" fill="none" stroke="#c2410c"/>
+            <text x="281" y="58" text-anchor="middle" font-family="DM Mono" font-size="6" fill="#c2410c">CLAIM</text>
+            <!-- caveat note -->
+            <text x="14" y="22" font-family="Caveat" font-size="14" fill="#d4a256">paste · not import · we like brevity</text>
+            <line x1="14" y1="26" x2="180" y2="26" stroke="#3a2c20" stroke-dasharray="2 2"/>
+            <!-- decorative tick marks -->
+            <g stroke="#3a2c20" stroke-width="1">
+              <line x1="6" y1="100" x2="316" y2="100"/>
+              <line x1="14" y1="100" x2="14" y2="106"/>
+              <line x1="42" y1="100" x2="42" y2="106"/>
+              <line x1="70" y1="100" x2="70" y2="106"/>
+              <line x1="98" y1="100" x2="98" y2="106"/>
+              <line x1="126" y1="100" x2="126" y2="106"/>
+              <line x1="154" y1="100" x2="154" y2="106"/>
+              <line x1="182" y1="100" x2="182" y2="106"/>
+              <line x1="210" y1="100" x2="210" y2="106"/>
+              <line x1="238" y1="100" x2="238" y2="106"/>
+              <line x1="266" y1="100" x2="266" y2="106"/>
+              <line x1="294" y1="100" x2="294" y2="106"/>
+            </g>
+            <text x="160" y="120" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#7a5a40" letter-spacing="2">~ 60 SECONDS ~</text>
+          </svg>
+        </div>
+        <div class="step-cap">
+          <span>fig. 3.1 — claim flow</span><span>step i.</span>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step">
+        <div class="step-no">ii.</div>
+        <h3>We <em>auto-crawl</em> in the background.</h3>
+        <p>Every 4 minutes, our crawler hits the GitHub release API and your OG image. New tag → new entry. New OG → cover refresh. We never touch private repos or read tokens.</p>
+        <div class="step-illus">
+          <svg viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Hand-drawn orbit: clock + nodes -->
+            <circle cx="160" cy="65" r="42" fill="none" stroke="#3a2c20" stroke-dasharray="3 3"/>
+            <circle cx="160" cy="65" r="6" fill="#c2410c"/>
+            <text x="160" y="68" text-anchor="middle" font-family="DM Mono" font-size="6" fill="#1d1611">P</text>
+
+            <!-- 4 satellite nodes labelled -->
+            <g font-family="DM Mono" font-size="9" fill="#e9d5b5">
+              <circle cx="118" cy="65" r="12" fill="#251c15" stroke="#d4a256"/>
+              <text x="118" y="68" text-anchor="middle">v</text>
+
+              <circle cx="160" cy="23" r="12" fill="#251c15" stroke="#d4a256"/>
+              <text x="160" y="26" text-anchor="middle">og</text>
+
+              <circle cx="202" cy="65" r="12" fill="#251c15" stroke="#d4a256"/>
+              <text x="202" y="68" text-anchor="middle">⬢</text>
+
+              <circle cx="160" cy="107" r="12" fill="#251c15" stroke="#d4a256"/>
+              <text x="160" y="110" text-anchor="middle">md</text>
+            </g>
+
+            <!-- timestamp ticks around -->
+            <g font-family="DM Mono" font-size="7" fill="#7a5a40">
+              <text x="44" y="65">04:00</text>
+              <text x="276" y="65">04:04</text>
+              <text x="160" y="14" text-anchor="middle">04:08</text>
+              <text x="160" y="125" text-anchor="middle">04:12</text>
+            </g>
+
+            <!-- legend -->
+            <text x="14" y="22" font-family="Caveat" font-size="14" fill="#d4a256">runs whether you do or not</text>
+          </svg>
+        </div>
+        <div class="step-cap">
+          <span>fig. 3.2 — crawl orbit</span><span>step ii.</span>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step">
+        <div class="step-no">iii.</div>
+        <h3>You <em>climb</em> the board.</h3>
+        <p>Every release tag minted in the last 7 days adds to your velocity. Post a one-line update on Friday and you'll get a small visibility boost in the weekend digest. Featured slots are admin-curated.</p>
+        <div class="step-illus">
+          <svg viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Hand-drawn ascending staircase / podium -->
+            <rect x="18" y="92" width="80" height="22" fill="#251c15" stroke="#3a2c20"/>
+            <rect x="118" y="74" width="80" height="40" fill="#251c15" stroke="#3a2c20"/>
+            <rect x="218" y="56" width="80" height="58" fill="#251c15" stroke="#3a2c20"/>
+
+            <!-- rank numbers -->
+            <text x="58" y="108" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="20" fill="#b89472">3</text>
+            <text x="158" y="100" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="22" fill="#d4a256">2</text>
+            <text x="258" y="86" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="28" fill="#c2410c">1</text>
+
+            <!-- climbing curve over the top -->
+            <path d="M18 80 C 80 80, 100 60, 158 60 S 240 38, 298 38" stroke="#c2410c" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+            <circle cx="298" cy="38" r="4" fill="#c2410c"/>
+
+            <!-- caveat -->
+            <text x="14" y="22" font-family="Caveat" font-size="14" fill="#d4a256">post Fridays. get featured. ship more.</text>
+            <line x1="14" y1="26" x2="220" y2="26" stroke="#3a2c20" stroke-dasharray="2 2"/>
+          </svg>
+        </div>
+        <div class="step-cap">
+          <span>fig. 3.3 — the climb</span><span>step iii.</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ WHO IT'S FOR ============ -->
+  <section class="who" id="who">
+    <div class="section-eyebrow">Section IV · The Readership</div>
+    <h2 class="section-title">A board for <em>three</em> kinds of <em>builder</em>.</h2>
+
+    <div class="who-grid">
+      <div class="who-col first">
+        <svg class="who-mark" viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- magnifying glass over a list -->
+          <rect x="6" y="6" width="34" height="34" fill="none" stroke="#a85b30" stroke-width="2"/>
+          <line x1="11" y1="14" x2="35" y2="14" stroke="#b89472"/>
+          <line x1="11" y1="20" x2="32" y2="20" stroke="#b89472"/>
+          <line x1="11" y1="26" x2="35" y2="26" stroke="#b89472"/>
+          <line x1="11" y1="32" x2="28" y2="32" stroke="#b89472"/>
+          <circle cx="40" cy="40" r="8" fill="#1d1611" stroke="#c2410c" stroke-width="2"/>
+          <line x1="46" y1="46" x2="52" y2="52" stroke="#c2410c" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div class="who-tag">— Reader</div>
+        <h4>The <em>visitor</em>, browsing.</h4>
+        <p>Curious devs, hackernews scrollers, students looking for stack ideas, recruiters pretending not to be recruiters. Browse the board, drill into a project, copy its tag stack into your next side-project.</p>
+        <ul>
+          <li>No login required for reading.</li>
+          <li>Filter by stack: <i>"projects using Bun + Postgres"</i>.</li>
+          <li>RSS feed of the weekly top 10.</li>
+          <li>Saved boards if you do log in.</li>
+        </ul>
+      </div>
+
+      <div class="who-col">
+        <svg class="who-mark" viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- pen + tag -->
+          <path d="M10 38 L20 28 L34 14 L42 22 L28 36 L18 46 Z" fill="none" stroke="#c2410c" stroke-width="2"/>
+          <line x1="14" y1="42" x2="22" y2="34" stroke="#d4a256" stroke-width="2"/>
+          <circle cx="38" cy="18" r="2" fill="#d4a256"/>
+        </svg>
+        <div class="who-tag">— Creator</div>
+        <h4>The <em>creator</em>, shipping.</h4>
+        <p>Indiehackers actually building. You claim your project, sync your repo, and post a one-line "what shipped this week". Crawler does the rest. The leaderboard quietly motivates you to push on Sunday night.</p>
+        <ul>
+          <li>One repo per claim. Multi-claim for orgs.</li>
+          <li>Auto-imports release notes &amp; tags.</li>
+          <li>Weekly write-up nudge via email.</li>
+          <li>Friction-free badge for your own README.</li>
+        </ul>
+      </div>
+
+      <div class="who-col">
+        <svg class="who-mark" viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- adjustable knobs -->
+          <line x1="10" y1="14" x2="46" y2="14" stroke="#7a8540" stroke-width="2"/>
+          <line x1="10" y1="28" x2="46" y2="28" stroke="#7a8540" stroke-width="2"/>
+          <line x1="10" y1="42" x2="46" y2="42" stroke="#7a8540" stroke-width="2"/>
+          <circle cx="22" cy="14" r="4.5" fill="#1d1611" stroke="#d4a256" stroke-width="2"/>
+          <circle cx="38" cy="28" r="4.5" fill="#1d1611" stroke="#c2410c" stroke-width="2"/>
+          <circle cx="16" cy="42" r="4.5" fill="#1d1611" stroke="#d4a256" stroke-width="2"/>
+        </svg>
+        <div class="who-tag">— Editor / Admin</div>
+        <h4>The <em>admin</em>, curating.</h4>
+        <p>That's you, if you're running PushPad. Tune the velocity window, pick a featured project for the week, set the boost multiplier, and ban the occasional spam claim. Like editing a magazine — but the issue ships every Sunday.</p>
+        <ul>
+          <li>Velocity window: 1d → 30d.</li>
+          <li>Per-project featured boost (×1.0–×2.0).</li>
+          <li>Manual override on rank ties.</li>
+          <li>Weekly digest scheduling.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="final" id="claim">
+    <svg class="final-mark" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- A printer's mark / colophon: hand-drawn anvil + push -->
+      <circle cx="44" cy="44" r="40" fill="none" stroke="#3a2c20"/>
+      <circle cx="44" cy="44" r="34" fill="none" stroke="#3a2c20" stroke-dasharray="2 3"/>
+      <!-- arrow up out of the seal -->
+      <path d="M44 60 L44 28 M32 38 L44 26 L56 38" stroke="#c2410c" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- baseline -->
+      <line x1="28" y1="64" x2="60" y2="64" stroke="#d4a256" stroke-width="2"/>
+      <!-- 4 little marks -->
+      <line x1="22" y1="44" x2="14" y2="44" stroke="#3a2c20"/>
+      <line x1="74" y1="44" x2="66" y2="44" stroke="#3a2c20"/>
+    </svg>
+    <h2>Got a project? <br><em>Push it up</em>, <span class="amp">&amp;</span> let the board do the rest.</h2>
+    <p>Free to claim. Free to climb. Featured slots are editorial and unpaid. Sundays at midnight UTC, the board resets and the week starts again.</p>
+    <div class="final-cta">
+      <a class="btn btn-primary" href="#">Claim Your Project <span class="btn-arrow"></span></a>
+      <a class="btn btn-ghost" href="#">Read the Editorial Charter</a>
+    </div>
+    <div class="ticker">
+      <span>Latest claim · <b>Mailcrate</b> 2 min ago</span>
+      <span>Crawl in progress · <b>Linkfolio v1.10.0</b></span>
+      <span>Issue 19 prints · <b>Sunday 00:00 UTC</b></span>
+    </div>
+  </section>
+
+  <!-- ============ COLOPHON / footer ============ -->
+  <footer class="colophon">
+    <div>
+      <h5>Colophon</h5>
+      <p>PushPad — The Builders' Almanac is set in <i>Fraunces</i> for display, <i>DM Mono</i> for metadata, and <i>Caveat</i> for marginalia. Printed daily, in rust.</p>
+      <p>Maintained by indie hackers, for indie hackers. No VCs were harmed in the making of this leaderboard.</p>
+    </div>
+    <div>
+      <h5>The Board</h5>
+      <ul>
+        <li><a href="#">This Week</a></li>
+        <li><a href="#">This Month</a></li>
+        <li><a href="#">All-Time</a></li>
+        <li><a href="#">New &amp; Climbing</a></li>
+        <li><a href="#">Archive</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Builders</h5>
+      <ul>
+        <li><a href="#">Claim a Project</a></li>
+        <li><a href="#">Add Weekly Update</a></li>
+        <li><a href="#">README Badge</a></li>
+        <li><a href="#">RSS Feed</a></li>
+        <li><a href="#">API Docs</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>About</h5>
+      <ul>
+        <li><a href="#">Editorial Charter</a></li>
+        <li><a href="#">Velocity Formula</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Privacy &amp; Crawler Ethics</a></li>
+        <li><a href="#">Contact the Editor</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <div class="colophon-rule">
+    <span>© Vol. III · No. 18 · 2026 — PushPad</span>
+    <span class="stamp">Press run: ∞</span>
+    <span>Set in 56-pt Fraunces · Printed in #C2410C</span>
+    <span>Made by builders, for builders.</span>
+  </div>
+
+</div>
+</body>
+</html>

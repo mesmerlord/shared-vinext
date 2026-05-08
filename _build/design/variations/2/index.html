@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PushPad — The Builder's Almanac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400;9..144,500;9..144,700;9..144,900&family=DM+Mono:wght@400;500&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c140d;          /* warm dark - off-black with brown undertone */
+  --ink-2:#2a1f15;        /* slightly raised */
+  --ink-3:#3a2c1f;        /* card */
+  --ink-4:#4a3a2a;        /* hairline */
+  --cream:#f4ead6;        /* paper */
+  --cream-2:#e8dcc1;      /* aged */
+  --cream-3:#d6c9a8;      /* deeper aged */
+  --mustard:#f5b13a;      /* primary accent */
+  --mustard-2:#e89a1c;
+  --persimmon:#ff6b3d;    /* secondary accent */
+  --persimmon-2:#e85525;
+  --moss:#8aa86b;         /* tertiary, fresh-print green */
+  --plum:#7d3c5a;         /* rare accent */
+  --shadow: 4px 4px 0 var(--ink);
+  --shadow-cream: 3px 3px 0 var(--cream);
+  --shadow-mustard: 3px 3px 0 var(--mustard);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ink);color:var(--cream);font-family:"DM Mono", ui-monospace, monospace;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+
+/* riso speckle background */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(245,177,58,0.06) 0, transparent 38%),
+    radial-gradient(circle at 80% 70%, rgba(255,107,61,0.05) 0, transparent 42%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.96  0 0 0 0 0.92  0 0 0 0 0.84  0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  mix-blend-mode:screen;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:2;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(244,234,214,0.012) 3px 4px);
+}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px;position:relative;z-index:3}
+
+/* ========== HEADLINES ========== */
+.h-display{font-family:"Fraunces",serif;font-weight:900;font-variation-settings:"SOFT" 60,"WONK" 1;letter-spacing:-0.025em;line-height:0.92;color:var(--cream)}
+.h-italic{font-family:"Fraunces",serif;font-style:italic;font-weight:500;font-variation-settings:"SOFT" 80,"WONK" 1}
+.handwritten{font-family:"Caveat",cursive;font-weight:700}
+.kicker{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--mustard)}
+.kicker-cream{color:var(--cream-2)}
+
+/* ========== TOP STRIP ========== */
+.top-strip{
+  border-bottom:1px solid var(--ink-4);
+  background:linear-gradient(180deg, rgba(245,177,58,0.05), transparent);
+  font-size:11px; letter-spacing:0.06em;
+  padding:8px 0; color:var(--cream-3);
+}
+.top-strip .wrap{display:flex;justify-content:space-between;align-items:center;gap:24px}
+.top-strip .pulses{display:flex;gap:18px;align-items:center}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--moss);box-shadow:0 0 0 0 rgba(138,168,107,0.7);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(138,168,107,0.6)}70%{box-shadow:0 0 0 8px rgba(138,168,107,0)}100%{box-shadow:0 0 0 0 rgba(138,168,107,0)}}
+
+/* ========== NAV (masthead) ========== */
+.masthead{
+  padding:18px 0 16px;
+  border-bottom:1px dashed var(--ink-4);
+}
+.masthead .wrap{display:flex;align-items:center;gap:32px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.brand-mark{
+  width:46px;height:46px;background:var(--mustard);border:1px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  transform:rotate(-4deg);box-shadow:var(--shadow);
+}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:24px;letter-spacing:-0.02em;font-variation-settings:"SOFT" 100,"WONK" 1}
+.brand-tag{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--cream-3);margin-top:2px}
+.nav-links{display:flex;gap:28px;margin-left:auto;align-items:center}
+.nav-links a{color:var(--cream-2);text-decoration:none;font-size:13px;letter-spacing:0.02em}
+.nav-links a:hover{color:var(--mustard)}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;border:1.5px solid var(--ink);background:var(--mustard);color:var(--ink);
+  font-family:"DM Mono",monospace;font-size:12px;font-weight:500;letter-spacing:0.04em;
+  text-decoration:none;cursor:pointer;
+  box-shadow:3px 3px 0 var(--ink);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn-cream{background:var(--cream);color:var(--ink)}
+.btn-persimmon{background:var(--persimmon);color:var(--ink)}
+.btn-ghost{background:transparent;color:var(--cream);border-color:var(--ink-4);box-shadow:3px 3px 0 var(--ink-3)}
+
+/* ========== HERO ========== */
+.hero{position:relative;padding:72px 0 88px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns: 1.1fr 1fr;gap:64px;align-items:start}
+
+.issue-stamp{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:6px 14px 6px 6px;background:var(--cream);color:var(--ink);
+  border:1.5px solid var(--ink);transform:rotate(-2deg);
+  box-shadow:var(--shadow);
+  font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+}
+.issue-stamp .num{background:var(--persimmon);color:var(--ink);padding:4px 10px;border:1px solid var(--ink);font-weight:500}
+
+.hero h1{
+  margin:24px 0 0;
+  font-size:clamp(56px, 7.6vw, 108px);
+  line-height:0.88;
+}
+.hero h1 .scribble{position:relative;display:inline-block;color:var(--mustard)}
+.hero h1 .scribble svg{position:absolute;left:-6px;right:-6px;bottom:-12px;width:calc(100% + 12px);height:18px;pointer-events:none}
+.hero h1 .strike{position:relative;color:var(--cream-3)}
+.hero h1 .strike::after{content:"";position:absolute;left:-2%;right:-2%;top:54%;height:3px;background:var(--persimmon);transform:rotate(-2deg)}
+.hero h1 em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1;color:var(--persimmon);font-weight:500}
+
+.hero-lede{
+  margin:28px 0 32px;
+  font-family:"Fraunces",serif;font-weight:400;font-style:italic;
+  font-size:21px;line-height:1.45;color:var(--cream-2);
+  max-width:540px;
+}
+.hero-lede strong{font-style:normal;font-weight:700;color:var(--cream);background:linear-gradient(180deg,transparent 60%, rgba(245,177,58,0.35) 60%)}
+
+.hero-cta{display:flex;gap:14px;align-items:center;margin-bottom:28px}
+.hero-cta .btn{padding:14px 22px;font-size:13px}
+
+.hero-meta{display:flex;gap:28px;align-items:center;color:var(--cream-3);font-size:12px;letter-spacing:0.04em}
+.hero-meta .star{color:var(--mustard)}
+
+/* hero right column - "today's front-runner" card */
+.frontrunner{
+  position:relative;background:var(--cream);color:var(--ink);
+  border:2px solid var(--ink);padding:28px 28px 24px;
+  box-shadow:8px 8px 0 var(--mustard), 8px 8px 0 1px var(--ink);
+  transform:rotate(1.2deg);
+}
+.frontrunner::before{
+  content:"";position:absolute;top:-14px;left:24px;width:96px;height:28px;
+  background:var(--persimmon);border:1.5px solid var(--ink);
+  transform:rotate(-3deg);
+}
+.frontrunner-stamp{
+  position:absolute;top:-10px;left:32px;font-family:"DM Mono",monospace;
+  font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink);
+  transform:rotate(-3deg);font-weight:500;z-index:2;
+}
+.fr-row{display:flex;align-items:flex-start;gap:16px}
+.fr-rank{
+  flex-shrink:0;width:60px;height:60px;background:var(--mustard);
+  border:2px solid var(--ink);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-family:"Fraunces",serif;
+  transform:rotate(-4deg);box-shadow:3px 3px 0 var(--ink);
+}
+.fr-rank .num{font-size:30px;font-weight:900;line-height:1;font-variation-settings:"SOFT" 100,"WONK" 1}
+.fr-rank .label{font-family:"DM Mono",monospace;font-size:8px;letter-spacing:0.12em;margin-top:2px}
+.fr-name{font-family:"Fraunces",serif;font-size:32px;font-weight:900;line-height:1;font-variation-settings:"SOFT" 60,"WONK" 1;letter-spacing:-0.02em}
+.fr-tag{font-size:13px;color:#5b4530;margin-top:6px;line-height:1.4;font-style:italic;font-family:"Fraunces",serif}
+.fr-stack{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.fr-stack .chip{
+  padding:3px 8px;background:var(--ink);color:var(--cream);
+  font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.06em;
+  border:1px solid var(--ink);
+}
+.fr-stats{
+  margin-top:20px;padding-top:18px;
+  border-top:1px dashed var(--ink-4);
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;
+}
+.fr-stat .l{font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:#7a5d3f}
+.fr-stat .v{font-family:"Fraunces",serif;font-size:22px;font-weight:900;color:var(--ink);font-variation-settings:"SOFT" 60;line-height:1.1;margin-top:2px}
+.fr-stat .v .pct{color:var(--persimmon);font-size:14px}
+
+.fr-spark{margin-top:16px}
+.fr-update{
+  margin-top:14px;padding:12px 14px;background:var(--cream-2);
+  border-left:3px solid var(--persimmon);
+  font-family:"Fraunces",serif;font-style:italic;font-size:13px;line-height:1.45;color:var(--ink-2);
+}
+.fr-update .who{display:block;font-family:"DM Mono",monospace;font-style:normal;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#7a5d3f;margin-bottom:4px}
+
+/* hero decorations */
+.hero-deco-1{position:absolute;top:48px;right:-30px;width:160px;opacity:.85;pointer-events:none}
+.hero-deco-2{position:absolute;bottom:60px;left:-40px;width:140px;opacity:.7;pointer-events:none}
+
+/* ========== DIVIDER ========== */
+.section-divider{
+  display:flex;align-items:center;gap:18px;margin:40px 0;
+  font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.2em;color:var(--cream-3);text-transform:uppercase;
+}
+.section-divider::before,.section-divider::after{content:"";flex:1;height:1px;background:var(--ink-4)}
+.section-divider svg{flex-shrink:0}
+
+/* ========== LEADERBOARD ========== */
+.board{padding:32px 0 88px;position:relative}
+.board-head{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end;margin-bottom:32px}
+.board-head h2{margin:0;font-size:64px;line-height:0.92}
+.board-head .sub{font-family:"Fraunces",serif;font-style:italic;font-size:18px;color:var(--cream-2);margin-top:10px}
+.board-controls{display:flex;gap:8px;align-items:center}
+.board-controls .pill{
+  padding:8px 14px;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.06em;
+  border:1.5px solid var(--ink-4);color:var(--cream-2);background:transparent;cursor:pointer;
+}
+.board-controls .pill.active{background:var(--mustard);color:var(--ink);border-color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.board-controls .pill:hover:not(.active){border-color:var(--cream-3);color:var(--cream)}
+
+.board-grid{
+  display:grid;grid-template-columns:auto 1fr 1.4fr 1fr 1fr 1fr 1.6fr;
+  gap:0;
+  background:var(--ink-2);
+  border:1.5px solid var(--ink-4);
+}
+.bh{
+  font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--cream-3);padding:14px 16px;background:var(--ink-3);border-bottom:1px solid var(--ink-4);
+}
+.br{
+  display:contents;
+}
+.br > div{
+  padding:18px 16px;border-bottom:1px solid var(--ink-4);
+  display:flex;align-items:center;
+  transition: background .15s ease;
+}
+.br:hover > div{background:var(--ink-3)}
+.br:nth-child(odd) > div:not(.bh){background:rgba(58,44,31,0.25)}
+.br:nth-child(odd):hover > div{background:var(--ink-3)}
+.br:last-child > div{border-bottom:none}
+
+.b-rank{justify-content:center}
+.b-rank .badge{
+  width:42px;height:42px;display:flex;align-items:center;justify-content:center;
+  font-family:"Fraunces",serif;font-weight:900;font-size:18px;
+  border:1.5px solid var(--ink);transform:rotate(-3deg);
+  box-shadow:2px 2px 0 var(--ink);font-variation-settings:"SOFT" 100,"WONK" 1;
+}
+.b-rank .badge.gold{background:var(--mustard);color:var(--ink)}
+.b-rank .badge.silver{background:var(--cream);color:var(--ink)}
+.b-rank .badge.bronze{background:var(--persimmon);color:var(--ink)}
+.b-rank .badge.normal{background:var(--ink-4);color:var(--cream);border-color:var(--ink)}
+
+.b-trend{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.04em}
+.b-trend.up{color:var(--moss)}
+.b-trend.down{color:var(--persimmon)}
+.b-trend.flat{color:var(--cream-3)}
+.b-trend .arrow{font-family:"Fraunces",serif;font-weight:900;font-size:14px;margin-right:3px}
+
+.b-name{flex-direction:column;align-items:flex-start;gap:6px}
+.b-name .nm{font-family:"Fraunces",serif;font-weight:700;font-size:18px;color:var(--cream);font-variation-settings:"SOFT" 60;letter-spacing:-0.01em}
+.b-name .tag{font-family:"Fraunces",serif;font-style:italic;font-size:12px;color:var(--cream-3);line-height:1.3}
+
+.b-stack{flex-direction:column;align-items:flex-start;gap:6px;justify-content:center}
+.b-stack .chips{display:flex;gap:4px;flex-wrap:wrap}
+.b-stack .chip{
+  padding:2px 7px;background:transparent;border:1px solid var(--ink-4);
+  font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.06em;color:var(--cream-2);
+}
+.b-stack .by{font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.1em;color:var(--cream-3);text-transform:uppercase;margin-top:2px}
+
+.b-version{flex-direction:column;align-items:flex-start;gap:2px}
+.b-version .v{font-family:"DM Mono",monospace;font-size:13px;color:var(--mustard);font-weight:500}
+.b-version .ago{font-family:"DM Mono",monospace;font-size:10px;color:var(--cream-3);letter-spacing:0.04em}
+
+.b-vel{flex-direction:column;align-items:flex-start;gap:6px}
+.b-vel .num{font-family:"Fraunces",serif;font-weight:900;font-size:24px;line-height:1;font-variation-settings:"SOFT" 100,"WONK" 1}
+.b-vel.hot .num{color:var(--persimmon)}
+.b-vel.warm .num{color:var(--mustard)}
+.b-vel.cool .num{color:var(--cream-2)}
+.b-vel .lbl{font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.1em;color:var(--cream-3);text-transform:uppercase}
+
+.b-spark svg{width:100%;max-width:120px;height:34px}
+
+.b-update{flex-direction:column;align-items:flex-start;gap:4px}
+.b-update .quote{font-family:"Fraunces",serif;font-style:italic;font-size:13px;color:var(--cream-2);line-height:1.35}
+.b-update .meta{font-family:"DM Mono",monospace;font-size:9px;color:var(--cream-3);letter-spacing:0.08em;text-transform:uppercase}
+
+.board-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:24px;padding:16px 20px;border:1px dashed var(--ink-4);
+  font-family:"DM Mono",monospace;font-size:11px;color:var(--cream-3);letter-spacing:0.06em;
+}
+.board-foot .more{color:var(--mustard);text-decoration:none;border-bottom:1px solid var(--mustard)}
+
+/* ========== HOW IT WORKS ========== */
+.how{padding:88px 0;background:var(--ink-2);border-top:1px solid var(--ink-4);border-bottom:1px solid var(--ink-4);position:relative}
+.how::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><circle cx='30' cy='30' r='1' fill='%23f4ead6' opacity='0.04'/></svg>");
+}
+.how-head{text-align:center;margin-bottom:64px;position:relative;z-index:2}
+.how-head h2{font-size:72px;line-height:0.9;margin:14px 0 0}
+.how-head .sub{font-family:"Fraunces",serif;font-style:italic;font-size:20px;color:var(--cream-2);margin-top:16px;max-width:560px;margin-left:auto;margin-right:auto}
+
+.steps{display:grid;grid-template-columns:repeat(3, 1fr);gap:32px;position:relative;z-index:2}
+.step{
+  position:relative;padding:36px 28px 32px;background:var(--cream);color:var(--ink);
+  border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);
+}
+.step:nth-child(1){transform:rotate(-1.2deg)}
+.step:nth-child(2){transform:rotate(0.6deg)}
+.step:nth-child(3){transform:rotate(-0.4deg)}
+.step-num{
+  position:absolute;top:-22px;left:24px;
+  width:54px;height:54px;background:var(--persimmon);
+  border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Fraunces",serif;font-weight:900;font-size:28px;color:var(--ink);
+  transform:rotate(-6deg);font-variation-settings:"SOFT" 100,"WONK" 1;
+}
+.step:nth-child(2) .step-num{background:var(--mustard)}
+.step:nth-child(3) .step-num{background:var(--moss)}
+.step h3{
+  font-family:"Fraunces",serif;font-weight:900;font-size:30px;line-height:1.05;
+  letter-spacing:-0.02em;margin:18px 0 14px;font-variation-settings:"SOFT" 60,"WONK" 1;color:var(--ink);
+}
+.step p{color:#4a3a2a;font-size:13px;line-height:1.6;font-family:"DM Mono",monospace}
+.step-illus{margin:20px 0 8px;display:flex;justify-content:center;height:90px}
+.step-illus svg{height:100%;width:auto}
+.step-detail{
+  margin-top:18px;padding-top:16px;border-top:1px dashed #b8a885;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.step-detail .lbl{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.12em;color:#7a5d3f;text-transform:uppercase}
+.step-detail .val{font-family:"Fraunces",serif;font-style:italic;font-size:14px;color:var(--ink);font-weight:700}
+
+/* ========== AUDIENCE ========== */
+.audience{padding:88px 0}
+.audience-head{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end;margin-bottom:48px}
+.audience-head h2{font-size:68px;line-height:0.9;margin:14px 0 0}
+.audience-head .sub{font-family:"Fraunces",serif;font-style:italic;font-size:18px;color:var(--cream-2);max-width:440px;text-align:right;justify-self:end}
+.audience-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.aud-card{
+  position:relative;padding:32px 28px;background:var(--ink-2);border:1.5px solid var(--ink-4);
+  display:flex;flex-direction:column;
+}
+.aud-card:hover{border-color:var(--mustard);transform:translateY(-3px);transition:all .2s ease}
+.aud-icon{width:64px;height:64px;margin-bottom:18px}
+.aud-card h3{font-family:"Fraunces",serif;font-weight:900;font-size:28px;line-height:1.05;margin:0 0 6px;font-variation-settings:"SOFT" 60,"WONK" 1;letter-spacing:-0.02em;color:var(--cream)}
+.aud-card .role{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--mustard);margin-bottom:14px}
+.aud-card p{color:var(--cream-2);font-size:13px;line-height:1.6;flex:1}
+.aud-card ul{list-style:none;padding:0;margin:18px 0 0;border-top:1px dashed var(--ink-4);padding-top:16px}
+.aud-card li{font-size:12px;color:var(--cream-2);line-height:1.5;padding:4px 0;display:flex;align-items:flex-start;gap:8px}
+.aud-card li::before{content:"";flex-shrink:0;display:inline-block;width:6px;height:6px;background:var(--persimmon);margin-top:8px;border:1px solid var(--ink)}
+
+/* ========== FINAL CTA ========== */
+.final{padding:96px 0 120px;position:relative;overflow:hidden;background:linear-gradient(180deg, var(--ink) 0%, #2a1f15 100%)}
+.final-card{
+  position:relative;max-width:920px;margin:0 auto;text-align:center;
+  background:var(--cream);color:var(--ink);
+  padding:72px 60px;
+  border:2px solid var(--ink);
+  box-shadow:12px 12px 0 var(--mustard), 12px 12px 0 1px var(--ink);
+}
+.final-stamp{
+  position:absolute;top:-32px;right:-24px;width:140px;height:140px;
+}
+.final-card h2{
+  font-family:"Fraunces",serif;font-weight:900;font-size:84px;line-height:0.88;
+  letter-spacing:-0.03em;color:var(--ink);font-variation-settings:"SOFT" 100,"WONK" 1;
+  margin:0 0 24px;
+}
+.final-card h2 em{font-style:italic;color:var(--persimmon-2)}
+.final-card .scribble{position:relative;display:inline-block}
+.final-card .scribble svg{position:absolute;left:-4px;right:-4px;bottom:-14px;width:calc(100% + 8px);height:18px}
+.final-card .lede{
+  font-family:"Fraunces",serif;font-style:italic;font-size:22px;line-height:1.4;color:#5b4530;
+  max-width:580px;margin:0 auto 36px;
+}
+.final-cta-row{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap}
+.final-cta-row .btn{padding:16px 26px;font-size:13px}
+.final-cta-row .btn.primary{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.final-cta-row .btn.secondary{background:var(--cream);color:var(--ink);border-color:var(--ink)}
+.final-foot{
+  margin-top:36px;padding-top:24px;border-top:1px dashed #b8a885;
+  display:flex;justify-content:center;gap:32px;flex-wrap:wrap;
+  font-family:"DM Mono",monospace;font-size:11px;color:#7a5d3f;letter-spacing:0.08em;
+}
+.final-foot strong{color:var(--ink);font-weight:500}
+
+/* ========== FOOTER ========== */
+.footer{padding:48px 0 32px;border-top:1px solid var(--ink-4);background:var(--ink-2)}
+.footer .wrap{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}
+.foot-col h4{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--mustard);margin:0 0 14px}
+.foot-col a{display:block;color:var(--cream-2);text-decoration:none;font-size:12px;padding:4px 0}
+.foot-col a:hover{color:var(--mustard)}
+.foot-brand p{font-family:"Fraunces",serif;font-style:italic;font-size:14px;color:var(--cream-2);max-width:320px;margin:14px 0 0;line-height:1.5}
+.foot-bottom{
+  margin-top:36px;padding-top:20px;border-top:1px dashed var(--ink-4);
+  display:flex;justify-content:space-between;font-family:"DM Mono",monospace;font-size:10px;
+  color:var(--cream-3);letter-spacing:0.08em;
+}
+
+/* ========== UTILITY ========== */
+.tilt-l{transform:rotate(-1.5deg)}
+.tilt-r{transform:rotate(1.5deg)}
+.float{animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(-2deg)}}
+.float-2{animation:float 7s ease-in-out infinite reverse}
+
+/* tooltip-stamps for the marginalia */
+.marginalia{position:absolute;font-family:"Caveat",cursive;color:var(--mustard);font-size:18px;font-weight:700}
+
+/* page load stagger */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.rise{animation:rise .6s ease-out both}
+.d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}.d5{animation-delay:.45s}
+
+@media (max-width: 980px){
+  .hero-grid{grid-template-columns:1fr}
+  .board-grid{font-size:11px}
+  .board-grid{grid-template-columns: auto 1fr 1fr 1fr 1fr}
+  .b-stack,.b-update{display:none !important}
+  .steps,.audience-grid{grid-template-columns:1fr}
+  .footer .wrap{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ============== TOP STRIP ============== -->
+<div class="top-strip">
+  <div class="wrap">
+    <div class="pulses">
+      <span><span class="dot"></span> live · 14 ships in the last hour</span>
+      <span style="opacity:.5">|</span>
+      <span>velocity window: 7d rolling</span>
+    </div>
+    <div>
+      <span style="opacity:.7">issue №</span><strong style="color:var(--mustard)">047</strong>
+      <span style="opacity:.5;margin:0 10px">·</span>
+      <span>thu 08 may 2026</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== MASTHEAD ============== -->
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="#">
+      <div class="brand-mark">
+        <!-- hand-drawn paper plane / push pin -->
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M14 3 L24 13 L14 11 L13 22 L9 14 L4 12 Z" stroke="#1c140d" stroke-width="1.6" stroke-linejoin="round" fill="#1c140d" fill-opacity="0.08"/>
+          <circle cx="14" cy="3" r="1.4" fill="#1c140d"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">PushPad</div>
+        <div class="brand-tag">the builder's almanac</div>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="#board">leaderboard</a>
+      <a href="#how">how it works</a>
+      <a href="#audience">who's it for</a>
+      <a href="#" style="color:var(--cream-3)">archive</a>
+      <a href="#" class="btn btn-ghost">sign in</a>
+      <a href="#cta" class="btn">claim a project →</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============== HERO ============== -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+
+      <!-- LEFT -->
+      <div>
+        <div class="issue-stamp rise d1">
+          <span class="num">vol. iv</span>
+          <span>shipping season is open</span>
+        </div>
+
+        <h1 class="rise d2">
+          Where indie<br>
+          builders <span class="scribble">ship loud<svg viewBox="0 0 200 18" preserveAspectRatio="none"><path d="M2,12 C40,2 90,16 130,8 C160,2 180,14 198,6" stroke="#ff6b3d" stroke-width="3" fill="none" stroke-linecap="round"/></svg></span><br>
+          and <em>get seen.</em>
+        </h1>
+
+        <p class="hero-lede rise d3">
+          A public leaderboard for solo founders & weekend hackers.
+          We <strong>auto-crawl your GitHub releases</strong>, score what's shipping this week,
+          and pin the loudest builders to the front page. No follower count required.
+        </p>
+
+        <div class="hero-cta rise d4">
+          <a href="#cta" class="btn">claim your project →</a>
+          <a href="#board" class="btn btn-ghost">peek the board</a>
+        </div>
+
+        <div class="hero-meta rise d5">
+          <span><span class="star">★</span> 2,418 projects on the wall</span>
+          <span style="opacity:.4">·</span>
+          <span>free, forever, for builders</span>
+        </div>
+
+        <!-- decorative scribble margin note -->
+        <div class="marginalia handwritten" style="margin-top:36px;display:inline-block;color:var(--cream-3);transform:rotate(-2deg)">
+          ↳ ranked on velocity, not vibes.
+        </div>
+      </div>
+
+      <!-- RIGHT: today's frontrunner card -->
+      <div class="rise d3">
+        <div class="frontrunner">
+          <span class="frontrunner-stamp">★ today's #1</span>
+          <div class="fr-row">
+            <div class="fr-rank">
+              <div class="num">01</div>
+              <div class="label">RANK</div>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="fr-name">Linkfolio</div>
+              <div class="fr-tag">"a one-page link site that actually loads on 3G."</div>
+              <div class="fr-stack">
+                <span class="chip">Astro</span>
+                <span class="chip">Bun</span>
+                <span class="chip">Cloudflare</span>
+                <span class="chip">Stripe</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="fr-stats">
+            <div class="fr-stat">
+              <div class="l">latest</div>
+              <div class="v">v0.4.2</div>
+            </div>
+            <div class="fr-stat">
+              <div class="l">7d ships</div>
+              <div class="v">12 <span class="pct">↑38%</span></div>
+            </div>
+            <div class="fr-stat">
+              <div class="l">velocity</div>
+              <div class="v" style="color:var(--persimmon-2)">98.4</div>
+            </div>
+          </div>
+
+          <div class="fr-spark">
+            <!-- hand-drawn graphite sparkline -->
+            <svg viewBox="0 0 380 64" width="100%" height="64">
+              <defs>
+                <filter id="rough1"><feTurbulence baseFrequency="0.9" numOctaves="2"/><feDisplacementMap in="SourceGraphic" scale="1.2"/></filter>
+              </defs>
+              <line x1="0" y1="55" x2="380" y2="55" stroke="#1c140d" stroke-width="1" stroke-dasharray="2 3" opacity="0.3"/>
+              <path d="M5,48 L25,52 L48,40 L72,42 L96,30 L120,34 L142,22 L168,24 L192,26 L218,18 L242,20 L266,12 L290,14 L312,8 L336,4 L360,6 L376,3"
+                    stroke="#1c140d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5,48 L25,52 L48,40 L72,42 L96,30 L120,34 L142,22 L168,24 L192,26 L218,18 L242,20 L266,12 L290,14 L312,8 L336,4 L360,6 L376,3 L376,60 L5,60 Z"
+                    fill="#ff6b3d" fill-opacity="0.18"/>
+              <circle cx="376" cy="3" r="3" fill="#ff6b3d" stroke="#1c140d" stroke-width="1.2"/>
+              <text x="358" y="-1" font-family="DM Mono" font-size="9" fill="#1c140d" transform="translate(0,18)">+12</text>
+            </svg>
+          </div>
+
+          <div class="fr-update">
+            <span class="who">↳ ship's log · 2h ago by @nadia.b</span>
+            "shipped tag autocomplete + analytics dashboard. closing in on v0.5 — the import-from-bio feature is finally working without rate-limit panic."
+          </div>
+        </div>
+
+        <!-- decorative paper plane SVG -->
+      </div>
+    </div>
+  </div>
+
+  <!-- background hand-drawn doodles -->
+  <svg class="hero-deco-1 float" viewBox="0 0 160 160">
+    <!-- rocket / paper plane wonky -->
+    <g stroke="#f5b13a" stroke-width="1.5" fill="none" stroke-linecap="round">
+      <path d="M30 80 Q70 30 130 50 Q 100 90 70 130 Z" />
+      <path d="M30 80 L65 90 L70 130" />
+      <path d="M65 90 L100 60" />
+      <circle cx="115" cy="50" r="2" fill="#f5b13a"/>
+    </g>
+    <g stroke="#ff6b3d" stroke-width="1" fill="none" opacity="0.6">
+      <path d="M28 78 Q15 70 5 78"/>
+      <path d="M30 82 Q18 88 10 95"/>
+    </g>
+  </svg>
+  <svg class="hero-deco-2 float-2" viewBox="0 0 140 140">
+    <!-- pointing hand sketch -->
+    <g stroke="#f4ead6" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.45">
+      <path d="M30 80 Q35 60 50 50 L80 35"/>
+      <path d="M50 50 Q60 40 75 38 Q90 38 100 45"/>
+      <path d="M55 55 Q65 48 80 46"/>
+      <path d="M50 50 L55 90 Q60 110 80 105 L100 95 Q110 90 110 70"/>
+      <path d="M100 95 L100 70"/>
+      <path d="M90 100 L88 75"/>
+      <path d="M78 102 L78 78"/>
+    </g>
+  </svg>
+</section>
+
+<!-- ============== DIVIDER ============== -->
+<div class="wrap">
+  <div class="section-divider">
+    <svg width="40" height="14" viewBox="0 0 40 14"><path d="M2 7 Q10 1 20 7 T38 7" stroke="#f5b13a" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    <span>fresh off the press · the leaderboard</span>
+    <svg width="40" height="14" viewBox="0 0 40 14"><path d="M2 7 Q10 13 20 7 T38 7" stroke="#f5b13a" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+  </div>
+</div>
+
+<!-- ============== LEADERBOARD ============== -->
+<section class="board" id="board">
+  <div class="wrap">
+    <div class="board-head">
+      <div>
+        <div class="kicker">↳ updated 8m ago · auto-refreshes hourly</div>
+        <h2 class="h-display">This week's <span class="h-italic" style="color:var(--mustard)">shippers.</span></h2>
+        <div class="sub">8 of 2,418 — sorted by velocity score, weighted toward weeklies.</div>
+      </div>
+      <div class="board-controls">
+        <button class="pill active">7d</button>
+        <button class="pill">30d</button>
+        <button class="pill">all-time</button>
+        <button class="pill" style="margin-left:8px">↗ filter stack</button>
+      </div>
+    </div>
+
+    <div class="board-grid">
+      <!-- header row -->
+      <div class="bh">#</div>
+      <div class="bh">trend</div>
+      <div class="bh">project</div>
+      <div class="bh">stack</div>
+      <div class="bh">latest ship</div>
+      <div class="bh">velocity</div>
+      <div class="bh">last log</div>
+
+      <!-- ROW 1 -->
+      <div class="br">
+        <div class="b-rank"><div class="badge gold">1</div></div>
+        <div class="b-trend up"><span class="arrow">↑</span>+4</div>
+        <div class="b-name"><span class="nm">Linkfolio</span><span class="tag">"one-page link site that actually loads on 3G."</span></div>
+        <div class="b-stack"><div class="chips"><span class="chip">Astro</span><span class="chip">Bun</span><span class="chip">CF</span></div><div class="by">by @nadia.b</div></div>
+        <div class="b-version"><span class="v">v0.4.2</span><span class="ago">2h ago</span></div>
+        <div class="b-vel hot"><span class="num">98.4</span><span class="lbl">12 ships · 7d</span></div>
+        <div class="b-spark">
+          <svg viewBox="0 0 120 34">
+            <path d="M2,28 L14,30 L26,22 L38,24 L50,18 L62,20 L74,12 L86,14 L98,8 L110,4 L118,2" stroke="#ff6b3d" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="b-update"><span class="quote">"tag autocomplete + analytics dashboard live."</span><span class="meta">2h ago</span></div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="br">
+        <div class="b-rank"><div class="badge silver">2</div></div>
+        <div class="b-trend up"><span class="arrow">↑</span>+1</div>
+        <div class="b-name"><span class="nm">Tabula</span><span class="tag">"spreadsheets that don't gaslight your team."</span></div>
+        <div class="b-stack"><div class="chips"><span class="chip">Next.js</span><span class="chip">Postgres</span><span class="chip">Stripe</span></div><div class="by">by @kj.eng</div></div>
+        <div class="b-version"><span class="v">v1.10.0</span><span class="ago">9h ago</span></div>
+        <div class="b-vel hot"><span class="num">94.1</span><span class="lbl">9 ships · 7d</span></div>
+        <div class="b-spark">
+          <svg viewBox="0 0 120 34">
+            <path d="M2,30 L14,28 L26,26 L38,18 L50,22 L62,14 L74,18 L86,10 L98,12 L110,6 L118,8" stroke="#ff6b3d" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="b-update"><span class="quote">"row-level perms shipped. customer #14 wired up."</span><span class="meta">9h ago</span></div>
+      </div>
+
+      <!-- ROW 3 -->
+      <div class="br">
+        <div class="b-rank"><div class="badge bronze">3</div></div>
+        <div class="b-trend down"><span class="arrow">↓</span>-1</div>
+        <div class="b-name"><span class="nm">Crontab.dev</span><span class="tag">"explain any cron string in plain english + edge cases."</span></div>
+        <div class="b-stack"><div class="chips"><span class="chip">SvelteKit</span><span class="chip">Deno</span></div><div class="by">by @marcus_h</div></div>
+        <div class="b-version"><span class="v">v2.3.1</span><span class="ago">1d ago</span></div>
+        <div class="b-vel warm"><span class="num">87.2</span><span class="lbl">7 ships · 7d</span></div>
+        <div class="b-spark">
+          <svg viewBox="0 0 120 34">
+            <path d="M2,8 L14,12 L26,6 L38,16 L50,12 L62,18 L74,14 L86,20 L98,16 L110,22 L118,18" stroke="#f5b13a" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="b-update"><span class="quote">"natural-language → cron is finally public. take a look."</span><span class="meta">1d ago</span></div>
+      </div>
+
+      <!-- ROW 4 -->
+      <div class="br">
+        <div class="b-rank"><div class="badge normal">4</div></div>
+        <div class="b-trend up"><span class="arrow">↑</span>+8</div>
+        <div class="b-name"><span class="nm">Pebble Mail</span><span class="tag">"one-screen email client for people who hate email."</span></div>
+        <div class="b-stack"><div class="chips"><span class="chip">Tauri</span><span class="chip">Rust</span><span class="chip">SQLite</span></div><div class="by">by @rin.dev</div></div>
+        <div class="b-version"><span class="v">v0.8.4</span><span class="ago">14h ago</span></div>
+        <div class="b-vel warm"><span class="num">81.7</span><span class="lbl">8 ships · 7d</span></div>
+        <div class="b-spark">
+          <svg viewBox="0 0 120 34">
+            <path d="M2,30 L14,32 L26,28 L38,24 L50,22 L62,18 L74,14 L86,12 L98,8 L110,6 L118,4" stroke="#ff6b3d" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="b-update"><span class="quote">"snooze + threading rewrite — it's fast now. like, really."</span><span class="meta">14h ago</span></div>
+      </div>
+
+      <!-- ROW 5 -->
+      <div class="br">
+        <div class="b-rank"><div class="badge normal">5</div></div>
+        <div class="b-trend flat"><span class="arrow">→</span>same</div>
+        <div class="b-name"><span class="nm">Garden.so</span><span class="tag">"a private knowledge base that grows with you."</span></div>
+        <div class="b-stack"><div class="chips"><span class="chip">Remix</span><span class="chip">Postgres</span><span class="chip">Lemon</span></div><div class="by">by @ben.ng</div></div>
+        <div class="b-version"><span class="v">v3.2.0</span><span class="ago">2d ago</span></div>
+        <div class="b-vel warm"><span class="num">76.0</span><span class="lbl">6 ships · 7d</span></div>
+        <div class="b-spark">
+          <svg viewBox="0 0 120 34">
+            <path d="M2,16 L14,14 L26,18 L38,12 L50,16 L62,14 L74,12 L86,16 L98,10 L110,14 L118,12" stroke="#f5b13a" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="b-update"><span class="quote">"backlinks v3 — block-level refs without the headache."</span><span class="meta">2d ago</span></div>
+      </div>
+
+      <!-- ROW 6 -->
+      <div class="br">
+        <div class="b-rank"><div class="badge normal">6</div></div>
+        <div class="b-trend up"><span class="arrow">↑</span>+2</div>
+        <div class="b-name"><span class="nm">Soundjar</span><span class="tag">"audio snippet vault. drag in mp3s, get tagged search."</span></div>
+        <div class="b-stack"><div class="chips"><span class="chip">Vue</span><span class="chip">Hono</span><span class="chip">R2</span></div><div class="by">by @juno_makes</div></div>
+        <div class="b-version"><span class="v">v0.6.0</span><span class="ago">3d ago</span></div>
+        <div class="b-vel warm"><span class="num">71.8</span><span class="lbl">5 ships · 7d</span></div>
+        <div class="b-spark">
+          <svg viewBox="0 0 120 34">
+            <path d="M2,22 L14,18 L26,24 L38,16 L50,20 L62,14 L74,18 L86,12 L98,16 L110,10 L118,12" stroke="#f5b13a" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="b-update"><span class="quote">"waveform previews on hover. surprisingly fun."</span><span class="meta">3d ago</span></div>
+      </div>
+
+      <!-- ROW 7 -->
+      <div class="br">
+        <div class="b-rank"><div class="badge normal">7</div></div>
+        <div class="b-trend down"><span class="arrow">↓</span>-3</div>
+        <div class="b-name"><span class="nm">Quietlog</span><span class="tag">"a writing log that doesn't shame you for skipping a day."</span></div>
+        <div class="b-stack"><div class="chips"><span class="chip">SolidJS</span><span class="chip">Turso</span></div><div class="by">by @ada.writes</div></div>
+        <div class="b-version"><span class="v">v1.2.7</span><span class="ago">2d ago</span></div>
+        <div class="b-vel cool"><span class="num">64.5</span><span class="lbl">4 ships · 7d</span></div>
+        <div class="b-spark">
+          <svg viewBox="0 0 120 34">
+            <path d="M2,8 L14,10 L26,14 L38,12 L50,16 L62,18 L74,14 L86,20 L98,18 L110,22 L118,24" stroke="#d6c9a8" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="b-update"><span class="quote">"streak repair lands tomorrow. tested with 800 fake gaps."</span><span class="meta">2d ago</span></div>
+      </div>
+
+      <!-- ROW 8 -->
+      <div class="br">
+        <div class="b-rank"><div class="badge normal">8</div></div>
+        <div class="b-trend up"><span class="arrow">↑</span>new</div>
+        <div class="b-name"><span class="nm">Rakuun</span><span class="tag">"a tiny invoicing tool for freelancers in the EU."</span></div>
+        <div class="b-stack"><div class="chips"><span class="chip">Phoenix</span><span class="chip">Elixir</span><span class="chip">Stripe</span></div><div class="by">by @t.kondo</div></div>
+        <div class="b-version"><span class="v">v0.1.5</span><span class="ago">5h ago</span></div>
+        <div class="b-vel cool"><span class="num">59.2</span><span class="lbl">4 ships · 7d</span></div>
+        <div class="b-spark">
+          <svg viewBox="0 0 120 34">
+            <path d="M2,30 L14,28 L26,24 L38,26 L50,20 L62,22 L74,18 L86,16 L98,18 L110,14 L118,16" stroke="#d6c9a8" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="b-update"><span class="quote">"VAT-MOSS export, pdf templates, payment links — all in."</span><span class="meta">5h ago</span></div>
+      </div>
+    </div>
+
+    <div class="board-foot">
+      <span>showing 1–8 of <strong style="color:var(--cream)">2,418</strong> projects</span>
+      <a href="#" class="more">view the full board ↗</a>
+    </div>
+
+    <!-- annotation -->
+    <div style="position:relative;margin-top:30px">
+      <div class="handwritten" style="position:absolute;right:24px;top:-18px;color:var(--persimmon);font-size:18px;transform:rotate(-3deg)">↑ this is a real-feeling preview, btw</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== HOW IT WORKS ============== -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="how-head">
+      <div class="kicker">↳ no buttons, no setup hell</div>
+      <h2 class="h-display">Three steps. <span class="h-italic" style="color:var(--mustard)">A pot of coffee.</span></h2>
+      <div class="sub">You bring the github repo. We bring the crawl, the score, the spotlight.</div>
+    </div>
+
+    <div class="steps">
+
+      <!-- STEP 1 -->
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-illus">
+          <!-- pin / claim sketch -->
+          <svg viewBox="0 0 110 90">
+            <g stroke="#1c140d" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="20" y="18" width="70" height="52" fill="#f5b13a" stroke="#1c140d" transform="rotate(-3 55 44)"/>
+              <line x1="30" y1="32" x2="78" y2="30" transform="rotate(-3 55 44)"/>
+              <line x1="30" y1="40" x2="68" y2="38" transform="rotate(-3 55 44)"/>
+              <line x1="30" y1="48" x2="74" y2="46" transform="rotate(-3 55 44)"/>
+              <line x1="30" y1="56" x2="58" y2="54" transform="rotate(-3 55 44)"/>
+              <!-- pin -->
+              <circle cx="74" cy="22" r="6" fill="#ff6b3d"/>
+              <line x1="74" y1="28" x2="74" y2="38" stroke-width="2"/>
+            </g>
+          </svg>
+        </div>
+        <h3>Claim your project.</h3>
+        <p>Drop your GitHub repo URL. We sanity-check it, generate a slug, and pin it to the wall. Takes less time than your eslint config.</p>
+        <div class="step-detail">
+          <span class="lbl">avg time</span>
+          <span class="val">28 seconds</span>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-illus">
+          <svg viewBox="0 0 110 90">
+            <g stroke="#1c140d" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <!-- magnifying glass over a card -->
+              <rect x="16" y="40" width="60" height="40" fill="#f4ead6"/>
+              <line x1="22" y1="50" x2="68" y2="50"/>
+              <line x1="22" y1="58" x2="60" y2="58"/>
+              <line x1="22" y1="66" x2="64" y2="66"/>
+              <line x1="22" y1="74" x2="48" y2="74"/>
+              <!-- magnifier -->
+              <circle cx="76" cy="32" r="16" fill="#f5b13a"/>
+              <line x1="86" y1="42" x2="98" y2="56" stroke-width="3"/>
+              <!-- tag releases -->
+              <rect x="58" y="14" width="34" height="14" fill="#ff6b3d" transform="rotate(-6 75 21)"/>
+              <text x="62" y="24" font-family="DM Mono" font-size="8" fill="#1c140d" transform="rotate(-6 75 21)">v0.4.2</text>
+            </g>
+          </svg>
+        </div>
+        <h3>We crawl. Quietly.</h3>
+        <p>PushPad polls your GitHub releases hourly, pulls the OG image, parses tags & SHAs, and computes a velocity score weighted toward this week.</p>
+        <div class="step-detail">
+          <span class="lbl">checks per day</span>
+          <span class="val">24 polls</span>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-illus">
+          <svg viewBox="0 0 110 90">
+            <g stroke="#1c140d" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <!-- bar chart climbing -->
+              <rect x="14" y="64" width="12" height="14" fill="#d6c9a8"/>
+              <rect x="32" y="54" width="12" height="24" fill="#f5b13a"/>
+              <rect x="50" y="44" width="12" height="34" fill="#ff6b3d"/>
+              <rect x="68" y="30" width="12" height="48" fill="#8aa86b"/>
+              <!-- climber arrow -->
+              <path d="M14 70 L40 50 L60 38 L86 18" stroke="#1c140d" stroke-width="1.6"/>
+              <path d="M86 18 L78 22 M86 18 L82 28" stroke-width="1.6"/>
+              <!-- star at top -->
+              <path d="M86 14 L88 9 L91 14 L96 14 L92 17 L93 22 L88 19 L83 22 L84 17 L80 14 Z" fill="#f5b13a"/>
+            </g>
+          </svg>
+        </div>
+        <h3>Climb the board.</h3>
+        <p>Post weekly ship's-log notes. Velocity rises. You appear on the front page, in the digest, and in the public RSS. Free forever for builders.</p>
+        <div class="step-detail">
+          <span class="lbl">cost</span>
+          <span class="val">$0 — really</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============== AUDIENCE ============== -->
+<section class="audience" id="audience">
+  <div class="wrap">
+    <div class="audience-head">
+      <div>
+        <div class="kicker">↳ the cast of characters</div>
+        <h2 class="h-display">Who hangs out <span class="h-italic" style="color:var(--persimmon)">at the pad.</span></h2>
+      </div>
+      <div class="sub">Three roles, one notice-board. Designed for the messy, public, work-in-progress middle.</div>
+    </div>
+
+    <div class="audience-grid">
+
+      <div class="aud-card">
+        <div class="aud-icon">
+          <!-- visitor: reading glasses + steam -->
+          <svg viewBox="0 0 64 64">
+            <g stroke="#f5b13a" stroke-width="1.6" fill="none" stroke-linecap="round">
+              <circle cx="22" cy="40" r="9"/>
+              <circle cx="46" cy="40" r="9"/>
+              <line x1="31" y1="40" x2="37" y2="40"/>
+              <line x1="13" y1="38" x2="6" y2="34"/>
+              <line x1="55" y1="38" x2="62" y2="34"/>
+              <!-- newspaper folded -->
+              <rect x="20" y="8" width="24" height="16" fill="#1c140d" stroke="#f5b13a"/>
+              <line x1="24" y1="14" x2="40" y2="14" stroke="#f5b13a"/>
+              <line x1="24" y1="18" x2="36" y2="18" stroke="#f5b13a"/>
+            </g>
+          </svg>
+        </div>
+        <div class="role">the lurker</div>
+        <h3>Visitors browse the board.</h3>
+        <p>You're an indie hacker scouting what's shipping. PushPad is your morning coffee feed: scroll the leaderboard, click into stack tags, follow projects.</p>
+        <ul>
+          <li>Browse without an account</li>
+          <li>Filter by stack (Bun, Postgres, Stripe…)</li>
+          <li>Subscribe to weekly digest by RSS or email</li>
+        </ul>
+      </div>
+
+      <div class="aud-card">
+        <div class="aud-icon">
+          <svg viewBox="0 0 64 64">
+            <g stroke="#ff6b3d" stroke-width="1.6" fill="none" stroke-linecap="round">
+              <!-- hammer / build hand -->
+              <rect x="14" y="34" width="36" height="10" fill="#ff6b3d" stroke="#ff6b3d" transform="rotate(-25 32 39)"/>
+              <line x1="50" y1="40" x2="58" y2="50" stroke-width="3" transform="rotate(-25 50 45)"/>
+              <!-- spark -->
+              <line x1="20" y1="18" x2="22" y2="14"/>
+              <line x1="14" y1="22" x2="10" y2="22"/>
+              <line x1="14" y1="14" x2="10" y2="10"/>
+              <line x1="26" y1="14" x2="28" y2="10"/>
+            </g>
+          </svg>
+        </div>
+        <div class="role">the maker</div>
+        <h3>Creators claim & post.</h3>
+        <p>You ship. PushPad keeps score. Claim your project once, and your weekly velocity updates itself. Drop ship's-log notes when something breaks or lands.</p>
+        <ul>
+          <li>Auto-pulled releases & OG images</li>
+          <li>Public weekly notes (markdown)</li>
+          <li>Embed your velocity badge anywhere</li>
+        </ul>
+      </div>
+
+      <div class="aud-card">
+        <div class="aud-icon">
+          <svg viewBox="0 0 64 64">
+            <g stroke="#8aa86b" stroke-width="1.6" fill="none" stroke-linecap="round">
+              <!-- key + dials -->
+              <circle cx="22" cy="22" r="8"/>
+              <line x1="22" y1="14" x2="22" y2="8"/>
+              <line x1="22" y1="14" x2="26" y2="10"/>
+              <circle cx="22" cy="22" r="2" fill="#8aa86b"/>
+              <!-- second dial -->
+              <circle cx="44" cy="44" r="9"/>
+              <line x1="44" y1="44" x2="44" y2="38"/>
+              <line x1="44" y1="44" x2="50" y2="46"/>
+              <!-- connection -->
+              <path d="M28 28 Q35 36 38 38" stroke-dasharray="2 3"/>
+            </g>
+          </svg>
+        </div>
+        <div class="role">the editor</div>
+        <h3>Admin tunes the board.</h3>
+        <p>You run the wall. Tune the velocity window, boost a featured project for the week, flag spam, and keep the editorial voice consistent.</p>
+        <ul>
+          <li>Adjust velocity weights & decay window</li>
+          <li>Pin a featured project to the masthead</li>
+          <li>Curate the weekly digest copy</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============== FINAL CTA ============== -->
+<section class="final" id="cta">
+  <div class="wrap">
+    <div class="final-card">
+      <!-- corner stamp -->
+      <svg class="final-stamp" viewBox="0 0 140 140">
+        <g transform="rotate(12 70 70)">
+          <circle cx="70" cy="70" r="58" stroke="#ff6b3d" stroke-width="2" fill="none" stroke-dasharray="3 3"/>
+          <circle cx="70" cy="70" r="50" stroke="#ff6b3d" stroke-width="1.5" fill="none"/>
+          <text fill="#ff6b3d" font-family="DM Mono" font-size="9" letter-spacing="2">
+            <textPath href="#circletxt" startOffset="0">FREE FOR BUILDERS · NO CARD · SHIP MORE  ·  </textPath>
+          </text>
+          <path id="circletxt" d="M70,70 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" fill="none"/>
+          <text x="70" y="60" text-anchor="middle" font-family="Fraunces" font-size="14" font-weight="900" fill="#ff6b3d">join</text>
+          <text x="70" y="80" text-anchor="middle" font-family="Fraunces" font-size="20" font-weight="900" fill="#ff6b3d" font-style="italic">2,418</text>
+          <text x="70" y="92" text-anchor="middle" font-family="DM Mono" font-size="7" fill="#ff6b3d">PROJECTS</text>
+        </g>
+      </svg>
+
+      <div class="kicker" style="color:var(--persimmon-2)">↳ the only ask: ship something</div>
+      <h2>Pin your project to <span class="scribble">the wall.<svg viewBox="0 0 200 18" preserveAspectRatio="none"><path d="M2,12 C40,2 90,16 130,8 C160,2 180,14 198,6" stroke="#f5b13a" stroke-width="3" fill="none" stroke-linecap="round"/></svg></span><br><em>Climb in public.</em></h2>
+      <p class="lede">Free, forever, for builders. Drop your repo, post a weekly note, and let the board do the rest.</p>
+
+      <div class="final-cta-row">
+        <a href="#" class="btn primary">claim your project →</a>
+        <a href="#board" class="btn secondary">browse the board first</a>
+      </div>
+
+      <div class="final-foot">
+        <span><strong>28 sec</strong> to claim</span>
+        <span><strong>0</strong> credit card</span>
+        <span><strong>RSS</strong> + email digest</span>
+        <span><strong>github</strong>-only oauth</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-col foot-brand">
+      <a class="brand" href="#" style="margin-bottom:8px">
+        <div class="brand-mark" style="width:38px;height:38px">
+          <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+            <path d="M14 3 L24 13 L14 11 L13 22 L9 14 L4 12 Z" stroke="#1c140d" stroke-width="1.6" stroke-linejoin="round" fill="#1c140d" fill-opacity="0.08"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name" style="font-size:18px">PushPad</div>
+          <div class="brand-tag">the builder's almanac</div>
+        </div>
+      </a>
+      <p>A small, public notice-board for indie hackers. Made by builders, for builders. No metrics farms, no follower games.</p>
+    </div>
+    <div class="foot-col">
+      <h4>the board</h4>
+      <a href="#">leaderboard</a>
+      <a href="#">browse stacks</a>
+      <a href="#">weekly digest</a>
+      <a href="#">RSS feed</a>
+    </div>
+    <div class="foot-col">
+      <h4>builders</h4>
+      <a href="#">claim a project</a>
+      <a href="#">badge generator</a>
+      <a href="#">api / webhooks</a>
+      <a href="#">how velocity works</a>
+    </div>
+    <div class="foot-col">
+      <h4>elsewhere</h4>
+      <a href="#">the changelog</a>
+      <a href="#">github</a>
+      <a href="#">@pushpad</a>
+      <a href="#">say hi</a>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© pushpad almanac · vol. iv · issue 047 · printed on the open web</span>
+    <span>made by tired builders ☕ in tokyo + porto</span>
+  </div>
+</footer>
+
+</body>
+</html>

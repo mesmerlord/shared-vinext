@@ -1,0 +1,1739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1440" />
+<title>PushPad — The Shipping Gazette · Vol. 03 · Issue 47</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=GT+Sectra+Display&family=JetBrains+Mono:wght@300;400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:        #161310;          /* page background, almost-black warm */
+    --ink-2:      #1d1915;          /* secondary surface */
+    --ink-3:      #272118;          /* card surface */
+    --paper:      #ece4d3;          /* warm off-white, "newsprint" */
+    --paper-2:    #d8cdb6;          /* aged paper */
+    --rule:       #4a3f31;          /* hairline rule color on dark */
+    --rule-light: #b9ad94;          /* hairline rule on paper */
+    --mute:       #8a7e6a;          /* secondary text on dark */
+    --mute-2:     #5a4f3f;          /* secondary text on paper */
+    --accent:     #c8410b;          /* oxidized terracotta */
+    --accent-2:   #e7611f;          /* hot terracotta */
+    --gold:       #c69a3b;          /* deck color */
+    --green:      #5a7a2c;          /* up-tick */
+    --red:        #9a2a1a;          /* down-tick */
+    --serif:      'Fraunces', 'GT Sectra Display', Georgia, serif;
+    --sans:       'Inter Tight', -apple-system, system-ui, sans-serif;
+    --mono:       'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  *{ box-sizing: border-box; }
+  html, body{ margin:0; padding:0; }
+  body{
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* subtle paper grain on dark surfaces */
+  body::before{
+    content:"";
+    position: fixed; inset:0;
+    pointer-events:none; z-index: 1;
+    opacity: .045;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
+    mix-blend-mode: overlay;
+  }
+
+  a{ color: inherit; text-decoration: none; }
+
+  /* ---------- shared rules / type ---------- */
+  .rule{ height:1px; background: var(--rule); width:100%; }
+  .rule.thick{ height:3px; background: var(--paper); }
+  .rule.dbl{ height:5px; background: var(--paper); position:relative; }
+  .rule.dbl::after{ content:""; position:absolute; left:0; right:0; top:8px; height:1px; background: var(--paper); }
+  .rule.dotted{ background: none; border-top:1px dashed var(--rule); height:0; }
+
+  .smallcaps{
+    font-family: var(--sans);
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-weight: 600;
+    font-size: 11px;
+  }
+  .kicker{
+    font-family: var(--sans);
+    text-transform: uppercase;
+    letter-spacing: .22em;
+    font-weight: 600;
+    font-size: 10px;
+    color: var(--accent-2);
+  }
+  .label{
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: 10px;
+    color: var(--mute);
+  }
+  .num{
+    font-family: var(--mono);
+    font-feature-settings: "tnum" 1;
+  }
+
+  .page{
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 56px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ---------- top status strip ---------- */
+  .strip{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 9px 56px;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing:.04em;
+    color: var(--mute);
+    background: var(--ink-2);
+  }
+  .strip .group{ display:flex; gap: 22px; align-items:center; }
+  .strip .dot{
+    width:6px; height:6px; border-radius:50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 0 3px rgba(231,97,31,.18);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:.95; } 50%{ opacity:.45; } }
+  .strip .pill{
+    padding: 2px 8px; border:1px solid var(--rule);
+    color: var(--paper);
+  }
+  .ticker{
+    overflow:hidden; flex:1; max-width: 540px;
+    margin: 0 24px; position:relative; height: 16px;
+  }
+  .ticker-track{
+    display:flex; gap: 36px;
+    white-space: nowrap;
+    animation: ticker 40s linear infinite;
+    color: var(--paper);
+  }
+  .ticker-track span b{ color: var(--accent-2); font-weight:600; margin-right:4px; }
+  .ticker-track span em{ color: var(--mute); font-style: normal; margin-left:4px; }
+  @keyframes ticker{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    padding: 38px 0 22px;
+    border-bottom: 5px solid var(--paper);
+    position: relative;
+  }
+  .masthead::after{
+    content:""; position:absolute; left:56px; right:56px; bottom:-9px; height:1px; background: var(--paper);
+  }
+  .masthead-grid{
+    display:grid; grid-template-columns: 1fr auto 1fr;
+    align-items: end; gap: 32px;
+  }
+  .meta-left, .meta-right{
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--mute);
+  }
+  .meta-left b, .meta-right b{ color: var(--paper); font-weight: 500; font-style: normal; font-family: var(--sans); display:block; text-transform: uppercase; letter-spacing: .12em; font-size: 10px; margin-bottom:4px; }
+  .meta-right{ text-align: right; }
+  .meta-right .crumb{ display:inline-flex; gap:14px; align-items:center; }
+  .meta-right .crumb a{ position:relative; }
+  .meta-right .crumb a + a::before{ content:"·"; margin-right:14px; color: var(--mute); }
+
+  .wordmark{
+    text-align:center;
+    line-height: .82;
+  }
+  .wordmark h1{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600, "SOFT" 0, "WONK" 1;
+    font-size: 132px;
+    letter-spacing: -.035em;
+    margin: 0;
+    color: var(--paper);
+  }
+  .wordmark h1 .amp{ color: var(--accent-2); font-style: italic; font-variation-settings: "opsz" 144, "wght" 500, "SOFT" 100, "WONK" 1; }
+  .wordmark .tagline{
+    font-family: var(--serif); font-style: italic;
+    font-size: 16px;
+    color: var(--paper-2);
+    margin-top: 6px;
+    letter-spacing: .02em;
+  }
+  .wordmark .tagline .stars{ color: var(--accent-2); margin: 0 10px; letter-spacing: .3em; }
+
+  /* tiny banner ribbon under masthead */
+  .deck{
+    display:flex; align-items: stretch; gap: 0;
+    margin-top: 16px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .deck > div{
+    padding: 10px 16px; flex: 1;
+    border-right: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing:.04em; color: var(--mute);
+    display:flex; align-items:center; gap: 10px;
+  }
+  .deck > div:last-child{ border-right: none; }
+  .deck b{ color: var(--paper); font-weight: 500; }
+  .deck .accent{ color: var(--accent-2); }
+
+  /* ---------- HERO + LEADERBOARD section ---------- */
+  .hero-wrap{
+    display:grid;
+    grid-template-columns: 360px 1fr;
+    gap: 48px;
+    padding: 36px 0 28px;
+  }
+  /* LEFT lead column */
+  .lead{
+    border-right: 1px solid var(--rule);
+    padding-right: 36px;
+  }
+  .lead .section-tag{
+    display: inline-block;
+    background: var(--accent);
+    color: var(--paper);
+    padding: 4px 9px 3px;
+    font-family: var(--sans);
+    font-size: 11px; letter-spacing: .18em;
+    text-transform: uppercase; font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .lead h2{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 100, "wght" 500, "SOFT" 0, "WONK" 0;
+    font-size: 56px;
+    line-height: .95;
+    letter-spacing: -.025em;
+    margin: 0 0 18px;
+    color: var(--paper);
+  }
+  .lead h2 em{
+    font-style: italic;
+    color: var(--accent-2);
+    font-variation-settings: "opsz" 100, "wght" 400, "SOFT" 100, "WONK" 1;
+  }
+  .lead .subhead{
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.35;
+    color: var(--paper-2);
+    margin: 0 0 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .byline{
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--mute);
+    margin-bottom: 16px;
+  }
+  .byline b{ color: var(--paper); font-weight: 500; font-style: normal; font-family: var(--sans); text-transform: uppercase; letter-spacing: .1em; font-size: 10.5px; }
+
+  .body-col{
+    columns: 1;
+    column-gap: 24px;
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 14, "wght" 400;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--paper-2);
+  }
+  .body-col p{ margin: 0 0 12px; }
+  .body-col p:first-of-type::first-letter{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 700, "SOFT" 0, "WONK" 1;
+    font-size: 64px;
+    line-height: .82;
+    float: left;
+    padding: 4px 8px 0 0;
+    color: var(--accent-2);
+  }
+  .body-col p span.sc{
+    font-family: var(--sans);
+    text-transform: uppercase;
+    font-size: .82em;
+    letter-spacing: .08em;
+    font-weight: 600;
+    color: var(--paper);
+  }
+
+  .cta-row{
+    display:flex; gap: 0; margin-top: 18px;
+    border-top: 1px solid var(--rule);
+    padding-top: 18px;
+  }
+  .btn{
+    font-family: var(--sans);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-size: 11px;
+    padding: 13px 18px;
+    display: inline-flex; align-items:center; gap: 10px;
+    border: 1px solid var(--paper);
+    color: var(--ink);
+    background: var(--paper);
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+    cursor: pointer;
+  }
+  .btn:hover{ background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .btn.ghost{ background: transparent; color: var(--paper); border-color: var(--paper); margin-left: -1px; }
+  .btn.ghost:hover{ background: var(--paper); color: var(--ink); }
+  .btn .arrow{ transition: transform .2s ease; }
+  .btn:hover .arrow{ transform: translateX(3px); }
+
+  /* numbers strip under CTA */
+  .stat-strip{
+    margin-top: 22px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--rule);
+    border-bottom: none;
+  }
+  .stat-strip > div{
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+  }
+  .stat-strip > div:nth-child(2n){ border-right: none; }
+  .stat-strip .n{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 100, "wght" 500;
+    font-size: 28px;
+    color: var(--paper);
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -.02em;
+  }
+  .stat-strip .n .delta{ color: var(--green); font-size: 12px; font-family: var(--mono); margin-left: 6px; letter-spacing: .03em; }
+  .stat-strip .l{ font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+
+  /* RIGHT — leaderboard */
+  .board{
+    position: relative;
+  }
+  .board-head{
+    display:flex; align-items: end; justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 24px;
+  }
+  .board-head h3{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600, "WONK" 1;
+    font-size: 38px;
+    line-height: .9;
+    letter-spacing: -.02em;
+    margin: 0;
+  }
+  .board-head h3 em{ font-style: italic; color: var(--accent-2); }
+  .board-head .meta{
+    font-family: var(--mono);
+    font-size: 11px; color: var(--mute); letter-spacing: .04em;
+    text-align: right;
+  }
+  .board-head .meta b{ color: var(--paper); font-weight:500; }
+
+  .filters{
+    display:flex; gap: 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 14px;
+  }
+  .filters .f{
+    padding: 9px 14px;
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: .06em;
+    color: var(--mute);
+    border-right: 1px solid var(--rule);
+    cursor: pointer;
+    transition: color .15s ease, background .15s ease;
+  }
+  .filters .f:hover{ color: var(--paper); }
+  .filters .f.on{
+    color: var(--paper);
+    background: var(--ink-3);
+    box-shadow: inset 0 -2px 0 var(--accent-2);
+  }
+  .filters .f .c{ color: var(--mute); margin-left: 6px; font-size: 9.5px; }
+  .filters .grow{ flex:1; border-right: none; }
+  .filters .search{
+    border-right: none;
+    border-left: 1px solid var(--rule);
+    display:flex; gap:8px; align-items:center;
+    color: var(--mute);
+  }
+
+  /* TABLE */
+  .ldr{
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .ldr th{
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--mute);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--rule);
+    font-weight: 500;
+  }
+  .ldr th.r, .ldr td.r{ text-align:right; }
+  .ldr th.c, .ldr td.c{ text-align:center; }
+  .ldr td{
+    padding: 16px 10px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  .ldr tr.row{
+    transition: background .12s ease;
+  }
+  .ldr tr.row:hover{
+    background: linear-gradient(180deg, rgba(231,97,31,.06), rgba(231,97,31,.02));
+  }
+  .ldr tr.featured td{
+    background: linear-gradient(90deg, rgba(200,65,11,.16), rgba(200,65,11,0) 60%);
+    border-bottom: 1px solid rgba(200,65,11,.4);
+  }
+  .ldr tr.featured td:first-child{
+    border-left: 3px solid var(--accent-2);
+    padding-left: 8px;
+  }
+
+  /* col widths */
+  .ldr col.cr{ width: 64px; }
+  .ldr col.cn{ width: auto; }
+  .ldr col.cs{ width: 128px; }
+  .ldr col.cv{ width: 88px; }
+  .ldr col.csl{ width: 130px; }
+  .ldr col.cl{ width: 90px; }
+
+  .rank{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600, "WONK" 1;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -.02em;
+  }
+  .rank .mv{
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: .04em;
+    color: var(--mute);
+    display: block;
+    margin-top: 4px;
+    font-variation-settings: normal;
+  }
+  .rank .mv.up{ color: var(--green); }
+  .rank .mv.dn{ color: var(--red); }
+  .rank .mv.nw{ color: var(--accent-2); }
+
+  .proj{ display:flex; gap:12px; align-items:flex-start; }
+  .glyph{
+    flex: 0 0 36px; width:36px; height:36px;
+    border: 1px solid var(--rule);
+    background: var(--ink-3);
+    display:grid; place-items:center;
+    margin-top: 2px;
+  }
+  .pname{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 100, "wght" 600;
+    font-size: 21px;
+    line-height: 1;
+    color: var(--paper);
+    letter-spacing: -.012em;
+    margin-bottom: 5px;
+    display:flex; align-items:center; gap: 8px; flex-wrap: wrap;
+  }
+  .pname .feat-tag{
+    font-family: var(--mono); font-size: 9px; letter-spacing: .14em;
+    background: var(--accent); color: var(--paper);
+    padding: 2px 6px; text-transform: uppercase;
+  }
+  .pname .new-tag{
+    font-family: var(--mono); font-size: 9px; letter-spacing: .14em;
+    border: 1px solid var(--gold); color: var(--gold);
+    padding: 1px 6px; text-transform: uppercase;
+  }
+  .ptag{
+    font-family: var(--serif); font-style: italic;
+    font-size: 13.5px;
+    color: var(--paper-2);
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+  .pupdate{
+    font-family: var(--mono); font-size: 10.5px;
+    color: var(--mute);
+    line-height: 1.45;
+    border-left: 2px solid var(--rule);
+    padding-left: 8px;
+  }
+  .pupdate b{ color: var(--paper); font-weight: 400; }
+  .pupdate .qmark{ color: var(--accent-2); }
+
+  .stack{
+    display:flex; flex-wrap: wrap; gap: 4px;
+  }
+  .chip{
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: .06em;
+    padding: 2px 6px;
+    border: 1px solid var(--rule);
+    color: var(--paper-2);
+    text-transform: lowercase;
+  }
+  .chip.lang::before{
+    content:""; display:inline-block; width:6px; height:6px;
+    background: var(--accent-2); margin-right:5px; vertical-align: middle;
+  }
+
+  .ver{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--paper);
+  }
+  .ver .ago{ color: var(--mute); font-size: 10px; display:block; margin-top: 3px; }
+
+  .vbox{
+    display:flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  }
+  .vscore{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--paper);
+    letter-spacing: -.02em;
+  }
+  .vscore.hot{ color: var(--accent-2); }
+  .vbar{
+    width: 90px; height: 5px;
+    background: var(--rule); position: relative;
+  }
+  .vbar i{ position:absolute; top:0; bottom:0; left:0; background: var(--accent-2); display:block; }
+  .vbar.cold i{ background: var(--gold); }
+  .vlabel{ font-family: var(--mono); font-size: 9px; color: var(--mute); letter-spacing: .1em; text-transform: uppercase; }
+
+  .spark{
+    width: 100%; height: 36px; display:block;
+  }
+
+  /* board footer */
+  .board-foot{
+    display:flex; justify-content: space-between; align-items: center;
+    padding: 14px 0 0;
+    font-family: var(--mono);
+    font-size: 11px; color: var(--mute); letter-spacing: .06em;
+  }
+  .board-foot a.more{
+    color: var(--paper); border-bottom: 1px solid var(--paper);
+  }
+  .board-foot a.more:hover{ color: var(--accent-2); border-color: var(--accent-2); }
+
+  /* ---------- "ABOVE THE FOLD" ruled break ---------- */
+  .fold{
+    display:flex; align-items:center; gap: 20px;
+    padding: 28px 0;
+  }
+  .fold .l{ flex:1; height:1px; background: var(--paper); opacity:.45; }
+  .fold .label{ color: var(--paper); font-family: var(--serif); font-style: italic; font-size: 13px; letter-spacing: .04em; }
+  .fold .label::before, .fold .label::after{ content:"§"; color: var(--accent-2); margin: 0 10px; }
+
+  /* ---------- HOW IT WORKS — three-col gazette ---------- */
+  .section{ padding: 30px 0; }
+  .section .secthead{
+    display:grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: end;
+    gap: 24px;
+    border-top: 5px solid var(--paper);
+    border-bottom: 1px solid var(--paper);
+    padding: 14px 0 12px;
+    margin-bottom: 28px;
+  }
+  .section .secthead .cat{
+    font-family: var(--serif);
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "wght" 500;
+    font-size: 36px;
+    color: var(--accent-2);
+    letter-spacing: -.01em;
+    line-height: 1;
+  }
+  .section .secthead .cat b{ font-style: normal; color: var(--paper); }
+  .section .secthead .pg{ text-align:right; font-family: var(--mono); font-size: 11px; color: var(--mute); letter-spacing: .08em; }
+  .section .secthead .lead-line{
+    font-family: var(--serif); font-style: italic;
+    font-size: 17px; color: var(--paper-2);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .three{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .three > .col{
+    padding: 0 28px;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .three > .col:first-child{ padding-left: 0; }
+  .three > .col:last-child{ border-right: none; padding-right: 0; }
+
+  .step-num{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600, "WONK" 1;
+    font-size: 90px;
+    line-height: .85;
+    color: var(--paper);
+    letter-spacing: -.04em;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .step-num .roman{
+    font-family: var(--serif); font-style: italic;
+    font-variation-settings: "opsz" 100, "wght" 400;
+    font-size: 18px;
+    color: var(--accent-2);
+    margin-left: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    vertical-align: super;
+  }
+  .step-h{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600;
+    font-size: 28px;
+    letter-spacing: -.012em;
+    line-height: 1;
+    margin: 8px 0 14px;
+    color: var(--paper);
+  }
+  .step-h em{ font-style: italic; color: var(--accent-2); font-variation-settings: "opsz" 100, "wght" 500; }
+
+  .step-art{
+    height: 150px;
+    border: 1px solid var(--rule);
+    background:
+      linear-gradient(0deg, rgba(0,0,0,0) 95%, var(--rule) 95%) 0 0/100% 14px,
+      var(--ink-3);
+    margin-bottom: 14px;
+    display:grid; place-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .step-art svg{ width: 86%; height: 86%; }
+  .step-body{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 14, "wght" 400;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--paper-2);
+  }
+  .step-body p{ margin: 0 0 10px; }
+  .step-body code{
+    font-family: var(--mono); font-size: 11.5px;
+    background: var(--ink-3); padding: 1px 5px;
+    border: 1px solid var(--rule);
+    color: var(--accent-2);
+  }
+
+  /* ---------- WHO IT'S FOR — index card row ---------- */
+  .audience{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+  .card{
+    border: 1px solid var(--rule);
+    padding: 22px 22px 24px;
+    background:
+      repeating-linear-gradient(180deg, transparent 0 22px, var(--rule) 22px 23px),
+      var(--ink-2);
+    background-attachment: local;
+    position: relative;
+  }
+  .card .pin{
+    position:absolute; top: -6px; left: 22px;
+    background: var(--accent); color: var(--paper);
+    font-family: var(--mono); font-size: 10px;
+    padding: 4px 8px; letter-spacing: .14em;
+    text-transform: uppercase; font-weight: 600;
+  }
+  .card h4{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600, "WONK" 1;
+    font-size: 32px;
+    color: var(--paper);
+    margin: 14px 0 4px;
+    letter-spacing: -.012em;
+    line-height: 1;
+  }
+  .card .role{
+    font-family: var(--serif); font-style: italic;
+    font-size: 15px; color: var(--accent-2);
+    margin-bottom: 14px;
+  }
+  .card .role::before{ content:"— "; color: var(--mute); }
+  .card ul{
+    list-style: none; padding: 0; margin: 0;
+    font-family: var(--serif); font-size: 14px; color: var(--paper-2);
+    line-height: 1.55;
+  }
+  .card li{
+    padding-left: 20px;
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .card li::before{
+    content:"§";
+    position: absolute; left: 0; top: 0;
+    color: var(--accent-2);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+  }
+  .card .verdict{
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--rule);
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: .04em;
+    color: var(--mute);
+    text-transform: uppercase;
+  }
+  .card .verdict b{ color: var(--paper); font-weight: 500; }
+
+  /* ---------- final CTA / colophon ---------- */
+  .final{
+    margin: 40px 0 28px;
+    padding: 64px 56px;
+    background: var(--paper);
+    color: var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .final::before{
+    content:""; position:absolute; inset:0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+    opacity: .25; mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+  .final-grid{
+    display:grid; grid-template-columns: 1fr 320px;
+    gap: 60px; align-items: end; position: relative;
+  }
+  .final h2{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600, "WONK" 1;
+    font-size: 92px;
+    line-height: .9;
+    letter-spacing: -.035em;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+  .final h2 em{
+    font-style: italic;
+    color: var(--accent);
+    font-variation-settings: "opsz" 100, "wght" 500, "SOFT" 100, "WONK" 1;
+  }
+  .final .sub{
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    max-width: 520px;
+    color: var(--mute-2);
+    line-height: 1.4;
+  }
+  .final-form{
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    padding: 0;
+    display:flex; flex-direction: column;
+  }
+  .final-form .row{
+    display:flex;
+    border-bottom: 1px solid var(--ink);
+  }
+  .final-form .row:last-of-type{ border-bottom: none; }
+  .final-form label{
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--mute-2);
+    padding: 14px 14px 0;
+    flex: 0 0 110px;
+    border-right: 1px solid var(--rule-light);
+  }
+  .final-form input{
+    flex: 1; border: none; outline: none;
+    background: transparent;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .final-form input::placeholder{ color: var(--mute-2); opacity: .7; }
+  .final-form button{
+    border: none;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--sans);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    font-size: 12px;
+    padding: 18px 22px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px;
+    transition: background .15s ease, color .15s ease;
+  }
+  .final-form button:hover{ background: var(--accent); color: var(--paper); }
+  .final-form .row.pol{
+    padding: 10px 14px;
+    font-family: var(--serif); font-style: italic;
+    font-size: 12px; color: var(--mute-2);
+  }
+
+  /* ---------- footer / colophon ---------- */
+  .colophon{
+    padding: 28px 0 60px;
+    border-top: 1px solid var(--rule);
+    display:grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 32px;
+    font-family: var(--serif);
+    font-size: 13px;
+    color: var(--paper-2);
+    line-height: 1.55;
+  }
+  .colophon h6{
+    font-family: var(--sans);
+    font-size: 10px; letter-spacing: .18em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    color: var(--paper);
+    font-weight: 600;
+  }
+  .colophon ul{ list-style: none; padding:0; margin:0; }
+  .colophon li{ margin-bottom: 6px; }
+  .colophon a:hover{ color: var(--accent-2); }
+  .colophon .mark{
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 600, "WONK" 1;
+    font-size: 30px;
+    letter-spacing: -.02em;
+    color: var(--paper);
+    margin-bottom: 6px;
+  }
+  .colophon .mark .amp{ color: var(--accent-2); font-style: italic; }
+  .colophon .fineprint{
+    font-style: italic; color: var(--mute);
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--rule);
+    font-size: 12px;
+  }
+
+  /* ---------- micro animations ---------- */
+  @keyframes drift{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-2px); } }
+  .glyph svg{ width: 22px; height: 22px; }
+
+  /* link affordance */
+  .ulink{ text-decoration: underline; text-decoration-color: var(--accent-2); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .ulink:hover{ color: var(--accent-2); }
+
+</style>
+</head>
+<body>
+
+<!-- ============================ TOP STATUS STRIP ============================ -->
+<div class="strip">
+  <div class="group">
+    <span class="dot"></span>
+    <span><b style="color:var(--paper)">CRAWLER</b> · ONLINE · LAST SWEEP 41s AGO</span>
+    <span class="pill">v 2026.05.08</span>
+  </div>
+  <div class="ticker">
+    <div class="ticker-track">
+      <span><b>LINKFOLIO</b> v0.4.2 shipped <em>· 14m ago</em></span>
+      <span><b>TABULA</b> velocity ↑ 312 <em>· this week</em></span>
+      <span><b>CRONTAB.DEV</b> v1.10.0 shipped <em>· 38m ago</em></span>
+      <span><b>HARBORLOG</b> climbed 11 spots <em>· today</em></span>
+      <span><b>MAILVAULT</b> new entry <em>· #44</em></span>
+      <span><b>QUILLBOARD</b> v0.9.7 shipped <em>· 2h ago</em></span>
+      <!-- duplicated for seamless loop -->
+      <span><b>LINKFOLIO</b> v0.4.2 shipped <em>· 14m ago</em></span>
+      <span><b>TABULA</b> velocity ↑ 312 <em>· this week</em></span>
+      <span><b>CRONTAB.DEV</b> v1.10.0 shipped <em>· 38m ago</em></span>
+      <span><b>HARBORLOG</b> climbed 11 spots <em>· today</em></span>
+      <span><b>MAILVAULT</b> new entry <em>· #44</em></span>
+      <span><b>QUILLBOARD</b> v0.9.7 shipped <em>· 2h ago</em></span>
+    </div>
+  </div>
+  <div class="group">
+    <span>2,148 BUILDERS · 712 PROJECTS</span>
+    <span style="color:var(--paper)">SIGN&nbsp;IN</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ============================ MASTHEAD ============================ -->
+  <header class="masthead">
+    <div class="masthead-grid">
+      <div class="meta-left">
+        <b>The Shipping Gazette</b>
+        Vol. III · Issue No. 47<br/>
+        Friday — 8 May, 2026<br/>
+        Edited from a port town, somewhere on the internet
+      </div>
+
+      <div class="wordmark">
+        <h1>Push<span class="amp">·</span>Pad</h1>
+        <div class="tagline">
+          <span class="stars">✦ ✦ ✦</span>
+          THE FRONT PAGE OF INDIE SHIPPING
+          <span class="stars">✦ ✦ ✦</span>
+        </div>
+      </div>
+
+      <div class="meta-right">
+        <b>Today's Board</b>
+        <div class="crumb">
+          <a href="#" class="ulink">Leaderboard</a>
+          <a href="#">How it works</a>
+          <a href="#">For builders</a>
+          <a href="#">API</a>
+        </div>
+        <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--paper)">
+          NEXT&nbsp;CRAWL · 03:42
+        </div>
+      </div>
+    </div>
+
+    <div class="deck">
+      <div><b class="accent">●</b> <b>WEEK 19</b> — 312 releases tallied since Monday</div>
+      <div><b>VELOCITY</b> window: rolling 7 days, decay λ = 0.78</div>
+      <div><b>ENTRIES</b> 712 projects · 41 freshly claimed</div>
+      <div><b>HUMANS</b> 2,148 builders shipping in public</div>
+      <div><b>UPTIME</b> 99.97% · last incident <span class="accent">17 days ago</span></div>
+    </div>
+  </header>
+
+  <!-- ============================ HERO + LEADERBOARD ============================ -->
+  <section class="hero-wrap">
+    <!-- LEFT COLUMN: lead story -->
+    <aside class="lead">
+      <span class="section-tag">Lead Story · No. 01</span>
+      <h2>What's <em>actually</em> shipping this week, ranked by the people doing the shipping.</h2>
+      <p class="subhead">PushPad is a public leaderboard for indie SaaS that scores you on what you ship — not on what you tweet.</p>
+
+      <div class="byline">
+        <b>By the editors</b><br/>
+        <span>A correspondence from the build-in-public newsroom.</span>
+      </div>
+
+      <div class="body-col">
+        <p>Register a project, paste a GitHub repo and a domain, and the crawler does the rest. <span class="sc">PushPad</span> reads your releases, your <code style="font-family:var(--mono);font-size:.85em;color:var(--accent-2)">CHANGELOG.md</code>, your OG image and your weekly post, then puts you on the board next to everyone else who shipped that week.</p>
+        <p>The only score that counts is <span class="sc">velocity</span>: a decaying sum of releases, commits and human-readable notes over a rolling seven-day window. Burn quietly for three weeks and you fall off the front page. Ship one good Friday and you climb thirty spots before lunch.</p>
+        <p>No upvotes. No "Show HN" theatre. Just a board, a crawler, and a small editorial team that boosts one project a week — clearly marked, never bought.</p>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn" href="#">Claim your project <span class="arrow">→</span></a>
+        <a class="btn ghost" href="#">Browse the board</a>
+      </div>
+
+      <div class="stat-strip">
+        <div>
+          <div class="n">712 <span class="delta">+41 wk</span></div>
+          <div class="l">Projects on the board</div>
+        </div>
+        <div>
+          <div class="n">312</div>
+          <div class="l">Releases this week</div>
+        </div>
+        <div>
+          <div class="n">2,148</div>
+          <div class="l">Builders shipping public</div>
+        </div>
+        <div>
+          <div class="n">$0</div>
+          <div class="l">To list a project, ever</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT COLUMN: the leaderboard -->
+    <main class="board">
+      <div class="board-head">
+        <h3>This week's <em>board</em>.</h3>
+        <div class="meta">
+          <b>Sorted by velocity</b><br/>
+          Window 02–08 May · λ = 0.78 · Refreshes every 4 min<br/>
+          <span style="color:var(--accent-2)">● Live</span> — last update 41s ago
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="f on">All <span class="c">712</span></div>
+        <div class="f">Climbing <span class="c">88</span></div>
+        <div class="f">New <span class="c">41</span></div>
+        <div class="f">Featured <span class="c">7</span></div>
+        <div class="f">By stack ▾</div>
+        <div class="f grow"></div>
+        <div class="f search">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
+          search the board…
+        </div>
+      </div>
+
+      <table class="ldr">
+        <colgroup>
+          <col class="cr"><col class="cn"><col class="cs"><col class="cv"><col class="csl"><col class="cl">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Project · weekly note</th>
+            <th>Stack</th>
+            <th class="r">Velocity</th>
+            <th class="c">Last 7d</th>
+            <th class="r">Release</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- ROW 1 — Featured -->
+          <tr class="row featured">
+            <td>
+              <div class="rank">01<span class="mv up">▲ 4</span></div>
+            </td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <!-- glyph: linkfolio chain -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#e7611f" stroke-width="1.7" stroke-linecap="round">
+                    <rect x="3" y="9" width="8" height="6" rx="3"/>
+                    <rect x="13" y="9" width="8" height="6" rx="3"/>
+                    <path d="M9 12h6"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Linkfolio <span class="feat-tag">Editor's pick</span></div>
+                  <div class="ptag">A bento-grid portfolio for makers who hate Webflow. Drag, ship, done.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> shipped a CSV import for past projects + a public RSS endpoint. <span class="qmark">"</span>Spent two days on a 14ms perf win. Worth it.<span class="qmark">"</span> — @merrick</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">TypeScript</span>
+                <span class="chip">Next.js</span>
+                <span class="chip">Postgres</span>
+                <span class="chip">Stripe</span>
+                <span class="chip">Cloudflare</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore hot">948</div>
+                <div class="vbar"><i style="width:96%"></i></div>
+                <div class="vlabel">Burning</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,24 12,22 22,18 32,20 42,15 52,12 62,14 72,8 82,5 92,3 100,2"
+                          fill="none" stroke="#e7611f" stroke-width="1.6"/>
+                <polyline points="0,24 12,22 22,18 32,20 42,15 52,12 62,14 72,8 82,5 92,3 100,2 100,32 0,32"
+                          fill="rgba(231,97,31,.18)" stroke="none"/>
+                <circle cx="100" cy="2" r="2.2" fill="#e7611f"/>
+              </svg>
+            </td>
+            <td class="r">
+              <div class="ver">v0.4.2<span class="ago">14m ago</span></div>
+            </td>
+          </tr>
+
+          <!-- ROW 2 -->
+          <tr class="row">
+            <td><div class="rank">02<span class="mv up">▲ 1</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <rect x="3" y="4" width="18" height="16"/>
+                    <path d="M3 9h18M3 14h18M9 4v16M15 4v16"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Tabula</div>
+                  <div class="ptag">A spreadsheet that's actually a database. For solo founders who outgrow Notion.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> formula engine v2 in alpha — pivot tables and a Python UDF runner. <span class="qmark">"</span>Finally killed the LiveQuery N+1.<span class="qmark">"</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">Rust</span>
+                <span class="chip">Tauri</span>
+                <span class="chip">SQLite</span>
+                <span class="chip">React</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore hot">812</div>
+                <div class="vbar"><i style="width:84%"></i></div>
+                <div class="vlabel">Hot</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,20 10,18 20,22 30,17 40,14 50,16 60,11 70,9 80,12 90,7 100,5"
+                          fill="none" stroke="#e7611f" stroke-width="1.6"/>
+                <circle cx="100" cy="5" r="2.2" fill="#e7611f"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v2.1.0<span class="ago">3h ago</span></div></td>
+          </tr>
+
+          <!-- ROW 3 -->
+          <tr class="row">
+            <td><div class="rank">03<span class="mv dn">▼ 2</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 3v9l6 4"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Crontab.dev</div>
+                  <div class="ptag">Cron jobs without the server. Schedules a webhook, retries the failures.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> dashboard rewrite — runs view, p99 latency, retry timeline. New free tier: 1000 runs/mo.</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">Go</span>
+                <span class="chip">Bun</span>
+                <span class="chip">Workers</span>
+                <span class="chip">D1</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore">744</div>
+                <div class="vbar"><i style="width:78%"></i></div>
+                <div class="vlabel">Strong</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,8 10,11 20,9 30,14 40,12 50,18 60,16 70,20 80,17 90,22 100,19"
+                          fill="none" stroke="#c69a3b" stroke-width="1.6"/>
+                <circle cx="100" cy="19" r="2.2" fill="#c69a3b"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v1.10.0<span class="ago">38m ago</span></div></td>
+          </tr>
+
+          <!-- ROW 4 -->
+          <tr class="row">
+            <td><div class="rank">04<span class="mv up">▲ 11</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <path d="M3 18l6-12 4 8 3-5 5 9"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Harborlog <span class="new-tag">Climbing</span></div>
+                  <div class="ptag">Self-hosted log storage in 200MB. Promtail-compatible, SQLite-backed.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> went from 3 to 14 stars per day. Shipped a Grafana datasource and a Prometheus exporter.</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">Zig</span>
+                <span class="chip">SQLite</span>
+                <span class="chip">Docker</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore hot">691</div>
+                <div class="vbar"><i style="width:73%"></i></div>
+                <div class="vlabel">Hot</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,28 10,26 20,24 30,21 40,18 50,15 60,11 70,8 80,5 90,4 100,2"
+                          fill="none" stroke="#e7611f" stroke-width="1.6"/>
+                <circle cx="100" cy="2" r="2.2" fill="#e7611f"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v0.6.0<span class="ago">1d ago</span></div></td>
+          </tr>
+
+          <!-- ROW 5 -->
+          <tr class="row">
+            <td><div class="rank">05<span class="mv up">▲ 3</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <path d="M3 7h18l-2 12H5z"/>
+                    <path d="M8 7V5a4 4 0 0 1 8 0v2"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Quillboard</div>
+                  <div class="ptag">Threaded changelog hosting for indie SaaS. Markdown in, RSS+OG out.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> custom domains, retired Disqus comments, switched to email-on-reply. 2.3k MAU.</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">JavaScript</span>
+                <span class="chip">Astro</span>
+                <span class="chip">Postgres</span>
+                <span class="chip">Resend</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore">588</div>
+                <div class="vbar"><i style="width:62%"></i></div>
+                <div class="vlabel">Strong</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,16 10,14 20,18 30,15 40,12 50,11 60,9 70,12 80,8 90,10 100,7"
+                          fill="none" stroke="#e7611f" stroke-width="1.6"/>
+                <circle cx="100" cy="7" r="2.2" fill="#e7611f"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v0.9.7<span class="ago">2h ago</span></div></td>
+          </tr>
+
+          <!-- ROW 6 -->
+          <tr class="row">
+            <td><div class="rank">06<span class="mv up">▲ 2</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <rect x="4" y="6" width="16" height="12" rx="1"/>
+                    <path d="M4 8l8 6 8-6"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">MailVault</div>
+                  <div class="ptag">Encrypt-at-rest transactional email with built-in deliverability dashboards.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> SOC2 Type II passed. New BYO-DKIM flow, 30% drop in cold-start latency on AWS.</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">TypeScript</span>
+                <span class="chip">Hono</span>
+                <span class="chip">Postgres</span>
+                <span class="chip">Redis</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore">521</div>
+                <div class="vbar"><i style="width:56%"></i></div>
+                <div class="vlabel">Steady</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,18 10,17 20,18 30,15 40,16 50,13 60,15 70,12 80,11 90,13 100,10"
+                          fill="none" stroke="#c69a3b" stroke-width="1.6"/>
+                <circle cx="100" cy="10" r="2.2" fill="#c69a3b"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v3.2.1<span class="ago">5h ago</span></div></td>
+          </tr>
+
+          <!-- ROW 7 -->
+          <tr class="row">
+            <td><div class="rank">07<span class="mv">— 0</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <circle cx="9" cy="9" r="5"/>
+                    <path d="M14 14l6 6"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Sift.studio</div>
+                  <div class="ptag">A visual SQL workbench for product analysts who refuse to use Looker.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> ClickHouse adapter shipped. Charts now embed in Notion. Hiring a designer.</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">TypeScript</span>
+                <span class="chip">Vite</span>
+                <span class="chip">Tauri</span>
+                <span class="chip">DuckDB</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore">472</div>
+                <div class="vbar"><i style="width:50%"></i></div>
+                <div class="vlabel">Steady</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,14 10,16 20,13 30,15 40,14 50,12 60,15 70,13 80,16 90,14 100,15"
+                          fill="none" stroke="#c69a3b" stroke-width="1.6"/>
+                <circle cx="100" cy="15" r="2.2" fill="#c69a3b"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v0.18.3<span class="ago">1d ago</span></div></td>
+          </tr>
+
+          <!-- ROW 8 -->
+          <tr class="row">
+            <td><div class="rank">08<span class="mv dn">▼ 5</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <path d="M3 12c4-8 14-8 18 0-4 8-14 8-18 0z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Pixelmoth</div>
+                  <div class="ptag">Pixel-art sprite tool with onion-skin and a lossless palette pipeline.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> Quiet week — kid was sick. Pushed a small bugfix. Back next Monday.</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">C++</span>
+                <span class="chip">Qt6</span>
+                <span class="chip">CMake</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore">389</div>
+                <div class="vbar cold"><i style="width:42%"></i></div>
+                <div class="vlabel">Cooling</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,8 10,10 20,12 30,11 40,15 50,16 60,18 70,21 80,22 90,24 100,25"
+                          fill="none" stroke="#c69a3b" stroke-width="1.6"/>
+                <circle cx="100" cy="25" r="2.2" fill="#c69a3b"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v1.4.8<span class="ago">3d ago</span></div></td>
+          </tr>
+
+          <!-- ROW 9 -->
+          <tr class="row">
+            <td><div class="rank">09<span class="mv up">▲ 6</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <path d="M4 20V8l8-4 8 4v12"/>
+                    <path d="M9 20v-6h6v6"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Hearthstack</div>
+                  <div class="ptag">Boring, beautiful self-hosted home dashboards. No Yaml, no Home Assistant.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> shipped Matter support, dropped Node, ARM image now 18MB. <span class="qmark">"</span>Down from 240MB.<span class="qmark">"</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">Go</span>
+                <span class="chip">Templ</span>
+                <span class="chip">SQLite</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore">368</div>
+                <div class="vbar"><i style="width:39%"></i></div>
+                <div class="vlabel">Strong</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,24 10,21 20,18 30,19 40,16 50,12 60,14 70,9 80,11 90,7 100,8"
+                          fill="none" stroke="#e7611f" stroke-width="1.6"/>
+                <circle cx="100" cy="8" r="2.2" fill="#e7611f"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v0.7.1<span class="ago">6h ago</span></div></td>
+          </tr>
+
+          <!-- ROW 10 -->
+          <tr class="row">
+            <td><div class="rank">10<span class="mv nw">★ NEW</span></div></td>
+            <td>
+              <div class="proj">
+                <div class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ece4d3" stroke-width="1.6">
+                    <path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="pname">Pebblemark <span class="new-tag">New entry</span></div>
+                  <div class="ptag">Bookmark manager for engineers who keep tabs open for six months.</div>
+                  <div class="pupdate"><b>Wk 19 ·</b> Joined the board on Tuesday with a clean v0.1. AI-free tagging. 480 sign-ups in 48h.</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <span class="chip lang">Elixir</span>
+                <span class="chip">Phoenix</span>
+                <span class="chip">LiveView</span>
+              </div>
+            </td>
+            <td class="r">
+              <div class="vbox">
+                <div class="vscore">344</div>
+                <div class="vbar"><i style="width:36%"></i></div>
+                <div class="vlabel">Rising</div>
+              </div>
+            </td>
+            <td class="c">
+              <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                <polyline points="0,30 22,30 32,28 42,22 52,16 62,11 72,9 82,7 92,5 100,4"
+                          fill="none" stroke="#e7611f" stroke-width="1.6"/>
+                <circle cx="100" cy="4" r="2.2" fill="#e7611f"/>
+              </svg>
+            </td>
+            <td class="r"><div class="ver">v0.1.4<span class="ago">7h ago</span></div></td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div class="board-foot">
+        <div>Showing 1–10 of 712 · Next refresh in 03:42</div>
+        <div><a href="#" class="more">See the full board, 11 → 712 →</a></div>
+      </div>
+    </main>
+  </section>
+
+  <!-- ============================ FOLD ============================ -->
+  <div class="fold">
+    <div class="l"></div>
+    <div class="label">Continued below the fold</div>
+    <div class="l"></div>
+  </div>
+
+  <!-- ============================ HOW IT WORKS ============================ -->
+  <section class="section">
+    <div class="secthead">
+      <div class="cat"><b>The Process</b> — <em>three steps, no calls</em></div>
+      <div class="lead-line">Submit a project on Tuesday, ship a release on Friday — find yourself on the front page by Monday morning.</div>
+      <div class="pg">Section II · pp. 2</div>
+    </div>
+
+    <div class="three">
+      <!-- Step I -->
+      <div class="col">
+        <div class="step-num">01<span class="roman">claim</span></div>
+        <div class="step-h">Drop your <em>repo</em> and a domain.</div>
+
+        <div class="step-art">
+          <svg viewBox="0 0 320 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- form fields -->
+            <rect x="14" y="20" width="292" height="30" stroke="#4a3f31"/>
+            <text x="22" y="32" font-family="JetBrains Mono" font-size="9" fill="#8a7e6a" letter-spacing="1">REPO_URL</text>
+            <text x="22" y="44" font-family="JetBrains Mono" font-size="11" fill="#ece4d3">github.com/merrick/linkfolio</text>
+            <rect x="14" y="56" width="200" height="30" stroke="#4a3f31"/>
+            <text x="22" y="68" font-family="JetBrains Mono" font-size="9" fill="#8a7e6a" letter-spacing="1">DOMAIN</text>
+            <text x="22" y="80" font-family="JetBrains Mono" font-size="11" fill="#ece4d3">linkfolio.app</text>
+            <rect x="222" y="56" width="84" height="30" fill="#c8410b"/>
+            <text x="240" y="74" font-family="Inter Tight" font-weight="700" font-size="11" fill="#ece4d3" letter-spacing="2">CLAIM →</text>
+            <!-- ascii-ish underline -->
+            <path d="M14 102 L306 102" stroke="#4a3f31" stroke-dasharray="2 4"/>
+            <text x="14" y="118" font-family="JetBrains Mono" font-size="10" fill="#8a7e6a">verifying ownership via <tspan fill="#e7611f">.well-known/pushpad</tspan></text>
+            <text x="14" y="130" font-family="JetBrains Mono" font-size="10" fill="#5a7a2c">✓ verified · 1.4s</text>
+          </svg>
+        </div>
+
+        <div class="step-body">
+          <p>Paste your GitHub repository and your live domain. We verify ownership with a <code>.well-known/pushpad</code> file or a single signed DNS TXT — no OAuth dance, no marketplace, no waiting.</p>
+          <p>You keep the project. PushPad doesn't store your code, only metadata: tags, releases, deploy frequency, the OG card.</p>
+        </div>
+      </div>
+
+      <!-- Step II -->
+      <div class="col">
+        <div class="step-num">02<span class="roman">crawl</span></div>
+        <div class="step-h">We <em>read</em> what you ship, automatically.</div>
+
+        <div class="step-art">
+          <svg viewBox="0 0 320 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- timeline -->
+            <line x1="20" y1="70" x2="300" y2="70" stroke="#4a3f31"/>
+            <!-- ticks -->
+            <g font-family="JetBrains Mono" font-size="9" fill="#8a7e6a" letter-spacing="1">
+              <line x1="40" y1="65" x2="40" y2="75" stroke="#4a3f31"/>
+              <line x1="100" y1="65" x2="100" y2="75" stroke="#4a3f31"/>
+              <line x1="160" y1="65" x2="160" y2="75" stroke="#4a3f31"/>
+              <line x1="220" y1="65" x2="220" y2="75" stroke="#4a3f31"/>
+              <line x1="280" y1="65" x2="280" y2="75" stroke="#4a3f31"/>
+              <text x="32" y="88">MON</text>
+              <text x="92" y="88">TUE</text>
+              <text x="152" y="88">WED</text>
+              <text x="212" y="88">THU</text>
+              <text x="272" y="88">FRI</text>
+            </g>
+            <!-- release dots & labels -->
+            <g>
+              <circle cx="55" cy="70" r="4" fill="#c69a3b"/>
+              <text x="48" y="56" font-family="JetBrains Mono" font-size="9" fill="#c69a3b">v0.4.0</text>
+              <circle cx="115" cy="70" r="4" fill="#c69a3b"/>
+              <text x="108" y="56" font-family="JetBrains Mono" font-size="9" fill="#c69a3b">v0.4.1</text>
+              <circle cx="200" cy="70" r="6" fill="#e7611f"/>
+              <text x="186" y="52" font-family="JetBrains Mono" font-size="10" fill="#e7611f" font-weight="700">v0.4.2</text>
+              <text x="186" y="98" font-family="Fraunces" font-style="italic" font-size="10" fill="#ece4d3">+ weekly note</text>
+              <circle cx="270" cy="70" r="4" fill="#c69a3b" opacity=".4"/>
+              <text x="262" y="56" font-family="JetBrains Mono" font-size="9" fill="#8a7e6a">soon…</text>
+            </g>
+            <!-- crawler readouts -->
+            <g font-family="JetBrains Mono" font-size="9" fill="#8a7e6a">
+              <text x="20" y="118">readme.md   ✓  3.2kb</text>
+              <text x="20" y="130">og-image    ✓  1200×630</text>
+              <text x="160" y="118" fill="#e7611f">CHANGELOG   ✓  parsed</text>
+              <text x="160" y="130" fill="#5a7a2c">velocity    ↑  +312 wk</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="step-body">
+          <p>The crawler sweeps every four minutes. It pulls release tags, commit cadence, your <code>CHANGELOG.md</code>, your OG image, and a single weekly note you write in markdown.</p>
+          <p>Velocity is computed live: <code>Σ release_weight · e^(-λ·days)</code>. No vanity stars. No follower counts. Just shipping.</p>
+        </div>
+      </div>
+
+      <!-- Step III -->
+      <div class="col">
+        <div class="step-num">03<span class="roman">climb</span></div>
+        <div class="step-h">Climb the <em>board</em>. Get found.</div>
+
+        <div class="step-art">
+          <svg viewBox="0 0 320 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- staircase climbing -->
+            <g stroke="#4a3f31" fill="none">
+              <rect x="20" y="100" width="50" height="22"/>
+              <rect x="80" y="80" width="50" height="42"/>
+              <rect x="140" y="60" width="50" height="62"/>
+              <rect x="200" y="38" width="50" height="84"/>
+              <rect x="260" y="18" width="50" height="104"/>
+            </g>
+            <!-- numbers -->
+            <g font-family="Fraunces" font-size="14" fill="#ece4d3" font-weight="600">
+              <text x="36" y="116">#41</text>
+              <text x="96" y="106">#22</text>
+              <text x="156" y="86">#11</text>
+              <text x="218" y="64">#04</text>
+              <text x="276" y="44" fill="#e7611f">#01</text>
+            </g>
+            <!-- climbing person dots -->
+            <g fill="#e7611f">
+              <circle cx="285" cy="14" r="3"/>
+              <path d="M283 17 L283 26 M287 17 L287 26 M283 21 L287 21 M281 19 L289 19" stroke="#e7611f"/>
+            </g>
+            <!-- arrow -->
+            <path d="M40 122 Q160 130 290 30" stroke="#c8410b" stroke-width="1.4" fill="none" stroke-dasharray="3 3"/>
+          </svg>
+        </div>
+
+        <div class="step-body">
+          <p>Ship something good and the velocity score moves you up the board within minutes. Featured projects get a deck slot and a row in the Friday email — read by 11k builders.</p>
+          <p>No paid placements. The "Editor's pick" is one project a week, chosen by humans, marked clearly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ WHO IT'S FOR ============================ -->
+  <section class="section">
+    <div class="secthead">
+      <div class="cat"><b>The Readers</b> — <em>three desks, one paper</em></div>
+      <div class="lead-line">PushPad is read three ways: by the curious, by the makers, and by the editors keeping the whole thing honest.</div>
+      <div class="pg">Section III · pp. 3</div>
+    </div>
+
+    <div class="audience">
+      <article class="card">
+        <span class="pin">Visitor</span>
+        <h4>The drifter.</h4>
+        <div class="role">in search of something genuinely new this week</div>
+        <ul>
+          <li>Browse the front page like the back of a paper — top, by stack, by climb.</li>
+          <li>One-click subscribe to the Friday digest. No account required, ever.</li>
+          <li>Live-tail mode for those who refresh leaderboards on Friday at 5pm.</li>
+        </ul>
+        <div class="verdict"><b>Lives at:</b> the homepage</div>
+      </article>
+
+      <article class="card">
+        <span class="pin">Creator</span>
+        <h4>The maker.</h4>
+        <div class="role">shipping a side project, tired of begging for attention</div>
+        <ul>
+          <li>Claim your project in 90 seconds with a DNS TXT, never an OAuth scope.</li>
+          <li>Post a weekly markdown note — auto-syndicated to RSS, X and the Friday email.</li>
+          <li>An actual public scoreboard for shipping. No sponsored slots to compete with.</li>
+        </ul>
+        <div class="verdict"><b>Lives at:</b> /studio</div>
+      </article>
+
+      <article class="card">
+        <span class="pin">Editor</span>
+        <h4>The desk.</h4>
+        <div class="role">tunes the velocity engine, picks the weekly feature</div>
+        <ul>
+          <li>Adjust the velocity window (λ, span, decay) and preview the new ranking diff.</li>
+          <li>Promote one project a week into the Editor's pick — clearly marked, never paid.</li>
+          <li>Audit log: every boost, every ban, every weight nudge. Public, on /transparency.</li>
+        </ul>
+        <div class="verdict"><b>Lives at:</b> /desk</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================ FINAL CTA ============================ -->
+  <section class="final">
+    <div class="final-grid">
+      <div>
+        <div class="kicker" style="color:var(--accent);margin-bottom:14px">Subscribe · Sign up · Ship</div>
+        <h2>Claim your <em>project.</em><br/>Make Friday <em>count.</em></h2>
+        <p class="sub">Free forever for indie projects. Paste a repo, verify a domain, write a sentence about what you shipped this week. We'll do the math, the OG image, the RSS, and the front-page placement.</p>
+      </div>
+      <form class="final-form" onsubmit="event.preventDefault();this.querySelector('button').innerHTML='claimed →'">
+        <div class="row">
+          <label>Repo</label>
+          <input type="text" placeholder="github.com/you/yourproj" />
+        </div>
+        <div class="row">
+          <label>Domain</label>
+          <input type="text" placeholder="yourproj.com" />
+        </div>
+        <div class="row">
+          <label>Email</label>
+          <input type="email" placeholder="for the Friday digest" />
+        </div>
+        <button>
+          Claim slot
+          <span>↗</span>
+        </button>
+        <div class="row pol">
+          By claiming you agree to be read by the crawler — and by 11k other builders.
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============================ COLOPHON ============================ -->
+  <footer class="colophon">
+    <div>
+      <div class="mark">Push<span class="amp">·</span>Pad</div>
+      <p>An editorial leaderboard for indie SaaS, made by people who like shipping more than tweeting.</p>
+      <div class="fineprint">Vol. III · Issue 47 · printed in the warm ink of an oxidized terracotta. Set in Fraunces, Inter Tight & JetBrains Mono. Hand-drawn glyphs, no stock.</div>
+    </div>
+    <div>
+      <h6>The Board</h6>
+      <ul>
+        <li><a href="#" class="ulink">Live leaderboard</a></li>
+        <li><a href="#">Climbing this week</a></li>
+        <li><a href="#">New entries</a></li>
+        <li><a href="#">By language</a></li>
+        <li><a href="#">By stack</a></li>
+      </ul>
+    </div>
+    <div>
+      <h6>For Builders</h6>
+      <ul>
+        <li><a href="#">Claim a project</a></li>
+        <li><a href="#">Verify by DNS</a></li>
+        <li><a href="#">Weekly note format</a></li>
+        <li><a href="#">OG image specs</a></li>
+        <li><a href="#">Public API</a></li>
+      </ul>
+    </div>
+    <div>
+      <h6>The Desk</h6>
+      <ul>
+        <li><a href="#">Editorial principles</a></li>
+        <li><a href="#">Boost transparency</a></li>
+        <li><a href="#">Velocity formula</a></li>
+        <li><a href="#">Friday digest</a></li>
+        <li><a href="#">Contact the editors</a></li>
+      </ul>
+    </div>
+  </footer>
+
+</div><!-- /.page -->
+
+</body>
+</html>

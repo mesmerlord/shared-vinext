@@ -1,0 +1,65 @@
+/* QUIRK per design.md: Fraunces optical-size axis is load-bearing. The
+ * Google Fonts URL keeps `opsz` for both upright and italic.
+ * Both preconnect lines are reserved for the <head> block in layout.tsx;
+ * the @import here is the runtime fallback if those preconnects are dropped. */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,900&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* PushPad design tokens — paralleled in tailwind.config.cjs.
+ * See design.md for the full vocabulary. */
+:root {
+  --ink: #0e0b08;
+  --ink-2: #15110d;
+  --ink-3: #1e1813;
+  --paper: #f4eada;
+  --paper-2: #e9ddc6;
+  --paper-3: #d9caae;
+  --vermilion: #ff3b1f;
+  --vermilion-d: #d72407;
+  --saffron: #f5a524;
+  --leaf: #6fb36a;
+  --rule: rgba(244, 234, 218, 0.18);
+  --rule-strong: rgba(244, 234, 218, 0.42);
+
+  --type-display: "Fraunces", "Times New Roman", serif;
+  --type-body: "Inter Tight", system-ui, sans-serif;
+  --type-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  body {
+    color: var(--paper);
+    font-family: var(--type-body);
+    background:
+      radial-gradient(
+        1200px 700px at 80% -10%,
+        rgba(255, 59, 31, 0.1),
+        transparent 60%
+      ),
+      radial-gradient(
+        900px 600px at -5% 30%,
+        rgba(245, 165, 36, 0.05),
+        transparent 60%
+      ),
+      var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* QUIRK per design.md: brand selection color, mandatory. */
+  ::selection {
+    background: var(--vermilion);
+    color: var(--ink);
+  }
+
+  /* Tabular numerals for any data containers. Mandatory. */
+  table,
+  .tabular,
+  .stat,
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}

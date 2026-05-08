@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+.wrangler
+.DS_Store
+.dev.vars
+.secrets.json
+*.log
+tsconfig.tsbuildinfo
+public/r2/
+worker-configuration.d.ts

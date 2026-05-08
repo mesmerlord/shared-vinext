@@ -1,0 +1,39 @@
+# PushPad — local-only env vars for `wrangler dev` / `vinext dev`.
+#
+# Copy this file to `.dev.vars` and fill in real values. `.dev.vars` is
+# gitignored so it never leaves your machine.
+#
+# For PRODUCTION, do NOT use this file. Set secrets via:
+#     wrangler secret put <NAME>
+# (or bulk via `npm run secrets:push` reading `.secrets.json`).
+# Non-secret prod vars go in `wrangler.jsonc` `vars`.
+
+# Auth.js signing secret. Required. Generate via:
+#     openssl rand -hex 32
+AUTH_SECRET=dev-secret-change-me
+
+# App URL Auth.js uses for callback construction. Use the dev port locally,
+# the prod URL in production.
+APP_URL=http://localhost:3010
+
+# Public R2 base URL. In dev, point at the local /api/r2 proxy. In prod,
+# point at your CDN-fronted R2 bucket (e.g. https://cdn.pushpad.example).
+R2_PUBLIC_URL=http://localhost:3010
+
+# Email of the user who should be auto-promoted to admin on first sign-in.
+ADMIN_EMAIL=you@example.com
+
+# Google OAuth client ID. Create at: https://console.cloud.google.com/
+# → APIs & Services → Credentials → OAuth 2.0 Client IDs.
+# Authorized redirect URI: <APP_URL>/api/auth/callback/google
+AUTH_GOOGLE_ID=
+
+# Google OAuth client secret (paired with AUTH_GOOGLE_ID above).
+AUTH_GOOGLE_SECRET=
+
+# OPTIONAL — GitHub Personal Access Token. Lifts the GitHub API rate limit
+# from 60 req/hr (anon) to 5,000 req/hr (authenticated). Without this the
+# Monday 06:00 UTC cron re-crawl can hit the anon cap on a moderately-sized
+# product catalog. Create a fine-grained PAT with **public_repo: read-only**
+# scope at: https://github.com/settings/tokens?type=beta
+GITHUB_TOKEN=

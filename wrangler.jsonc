@@ -1,0 +1,95 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pushpad",
+  "compatibility_date": "2026-03-01",
+  // QUIRK: nodejs_compat is required because @auth/core and Stripe SDK
+  // call into Node-shape APIs.
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "src/worker.ts",
+  "limits": {
+    // Queue consumers can spend real CPU on crawling + image-byte work.
+    // Cloudflare's default consumer CPU cap is 30s; give the consumer more
+    // headroom without taking the cap all the way to 5 minutes.
+    "cpu_ms": 120000
+  },
+  "assets": {
+    "not_found_handling": "single-page-application"
+  },
+  "d1_databases": [
+    {
+      // run: wrangler d1 create pushpad-db
+      "binding": "DB",
+      "database_name": "pushpad-db",
+      "database_id": "<your-d1-id>",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      // run: wrangler kv namespace create pushpad-kv
+      "binding": "KV",
+      "id": "<your-kv-id>"
+    }
+  ],
+  "r2_buckets": [
+    {
+      // run: wrangler r2 bucket create pushpad-storage
+      "binding": "STORAGE",
+      "bucket_name": "pushpad-storage"
+    }
+  ],
+  // Queues power the async crawl pipeline (metadata / og_image / releases).
+  // Single-queue + DLQ pattern is the canonical default per canonical.md
+  // Topic 9. The 2-queue split with sequential consumer + processing-lease
+  // is documented as opt-in for rate-limited image pipelines.
+  // First-time setup:
+  //   wrangler queues create pushpad-crawl
+  //   wrangler queues create pushpad-crawl-dlq
+  "queues": {
+    "producers": [
+      {
+        "binding": "CRAWL_QUEUE",
+        "queue": "pushpad-crawl"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "pushpad-crawl",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 2,
+        "max_concurrency": 4,
+        "dead_letter_queue": "pushpad-crawl-dlq"
+      },
+      {
+        // DLQ no-op consumer — failed jobs are diagnosed via /admin/crawl-jobs.
+        "queue": "pushpad-crawl-dlq",
+        "max_batch_size": 10,
+        "max_batch_timeout": 30,
+        "max_retries": 0
+      }
+    ]
+  },
+  // Cron triggers — Monday 06:00 UTC weekly re-crawl of every claimed
+  // product. Implementation: src/worker.ts `scheduled` handler. Honors the
+  // `crawl.enabled` admin kill-switch and staggers enqueues by
+  // `crawl.concurrency` (default 5 → ~12s spacing).
+  "triggers": {
+    "crons": ["0 6 * * 1"]
+  },
+  "vars": {
+    "APP_URL": "https://pushpad.example",
+    "ADMIN_EMAIL": "you@example.com",
+    "R2_PUBLIC_URL": "https://cdn.pushpad.example",
+    "AUTH_GOOGLE_ID": "<your-google-oauth-client-id>"
+  }
+  // Secrets synced via: npm run secrets:push (reads .secrets.json)
+  // Required secrets in .secrets.json:
+  //   AUTH_SECRET           — Auth.js signing secret (openssl rand -hex 32)
+  //   AUTH_GOOGLE_SECRET    — Google OAuth client secret
+  //   GITHUB_TOKEN          — OPTIONAL. PAT for GitHub API rate limit lift
+  //                           (60 req/hr anon → 5,000 req/hr authenticated).
+  //                           Leave unset to use anonymous fallback.
+  // QUIRK: secrets are pushed BEFORE deploy on every run via the `deploy`
+  // script — see package.json. Order matters: secrets first, then deploy.
+}
