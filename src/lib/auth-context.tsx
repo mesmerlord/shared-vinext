@@ -32,6 +32,9 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const SESSION_REFRESHED_KEY = "pushpad_session_refreshed_at";
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 export function AuthProvider({
   children,
   initialUser = null,
@@ -88,6 +91,18 @@ export function AuthProvider({
       await utils.auth.me.invalidate();
     }
   }, [utils]);
+
+  // Auth.js only slides the 30-day session cookie when /api/auth/session is
+  // hit, and nothing else hits it, so touch it once a day while signed in.
+  useEffect(() => {
+    if (!user) return;
+    if (Date.now() - Number(localStorage.getItem(SESSION_REFRESHED_KEY)) < DAY_MS) return;
+    fetch("/api/auth/session", { credentials: "include" })
+      .then((res) => {
+        if (res.ok) localStorage.setItem(SESSION_REFRESHED_KEY, String(Date.now()));
+      })
+      .catch(() => {});
+  }, [user]);
 
   useEffect(() => {
     if (user && pendingCallback) {
