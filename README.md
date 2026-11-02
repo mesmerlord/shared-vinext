@@ -215,7 +215,7 @@ Quick sanity checks:
 npm run db:migrate:remote
 
 # 2. Push secrets and deploy. The `deploy` script chains:
-#    wrangler secret bulk .secrets.json && vinext deploy
+#    wrangler secret bulk .secrets.json && vinext build && wrangler deploy
 npm run deploy
 ```
 
@@ -340,9 +340,6 @@ Then submit a product at `/submit` — you'll see `[crawl.consumer]` log lines f
 ---
 
 ## Troubleshooting
-
-**vinext can't find `virtual:vinext-rsc-entry`**
-The plugin order in `vite.config.ts` is load-bearing. It must be `vinext()` → `rsc({ entries })` → `cloudflare(...)`. The three magic virtual entry IDs (`virtual:vinext-rsc-entry`, `virtual:vinext-app-ssr-entry`, `virtual:vinext-app-browser-entry`) are framework-internal contracts at vinext 0.0.34 — copy verbatim, don't rename.
 
 **Auth.js callback fails with "callback URL mismatch"**
 The Google OAuth redirect URI must exactly match `<APP_URL>/api/auth/callback/google`. In dev that's `http://localhost:3010/api/auth/callback/google`. If you changed the dev port in `vite.config.ts`, update the redirect URI in Google Cloud Console too.

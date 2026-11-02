@@ -21,11 +21,11 @@ A full-stack Cloudflare Workers app (vinext + tRPC + Drizzle + D1 + R2 + KV + Qu
 
 For each pattern: **WHAT** it does, **WHERE** to find it, **PRESERVE** what's load-bearing, **CHANGE** what's product-specific.
 
-### Vite plugin trio + virtual entries
+### Vite plugins
 
-- WHAT: Three plugins in a fixed order; vinext is paired with explicit `@vitejs/plugin-rsc` because `vinext({ rsc: false })` shifts ownership to the RSC plugin. Three magic virtual entry IDs are passed in.
+- WHAT: `vinext()` then `cloudflare(...)`. vinext 1.x registers `@vitejs/plugin-rsc` itself (its Cloudflare template does the same).
 - WHERE: `vite.config.ts`
-- PRESERVE: plugin order, the virtual entry IDs verbatim (`virtual:vinext-rsc-entry`, `virtual:vinext-app-ssr-entry`, `virtual:vinext-app-browser-entry`), and the `cloudflare({ viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] } })` block. These are framework-internal contracts at vinext 0.0.34.
+- PRESERVE: plugin order and the `cloudflare({ viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] } })` block.
 - CHANGE: `server.port` per project (PushPad uses 3010).
 
 ### Wrangler bindings + DLQ + cron

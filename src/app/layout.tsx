@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   },
 };
 
+// Render every page per request. Otherwise vinext 1.x keeps pages it deems static
+// (no dynamic segment, no headers()/searchParams) in isolate memory, never revalidated.
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: {

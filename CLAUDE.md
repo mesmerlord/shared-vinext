@@ -89,7 +89,7 @@ The canonical recipe — follow it whenever adding any new entity or capability:
 
 ## Common gotchas (the ones unique to THIS codebase)
 
-1. **Vite plugin order is load-bearing.** `vinext({ rsc: false })` → `rsc({ entries: { rsc, ssr, client } })` → `cloudflare({ viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] } })`. Reordering breaks the whole build silently. The three virtual entry IDs are framework-internal contracts — do not rename.
+1. **Vite plugin order is load-bearing.** `vinext()` → `cloudflare({ viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] } })`. vinext 1.x registers `@vitejs/plugin-rsc` itself; don't add a second `rsc()` plugin.
 2. **`@auth/core` is pinned to `^0.41.2`.** A version bump breaks the synthetic-request session reader (`getAuthSession` in `src/server/auth.ts`). If you ever bump, manually re-test sign-in, sign-out, admin gate, and the JWT callback.
 3. **D1 has NO transactions.** `db.transaction(...)` will silently break. Use `db.batch([...])` for multi-statement atomicity. Pattern: `await db.batch([db.insert(...).values(...), db.update(...).set(...).where(...)])`.
 4. **D1 caps bound parameters at 100/statement.** Chunk large inserts. The canonical math: 8 rows × ~10 columns ≈ 80 params. See `idempotentInsertReleases` in `src/server/queries/products.ts`.
